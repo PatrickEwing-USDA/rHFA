@@ -6,12 +6,15 @@ Author: Who wrote it
 Maintainer: The package maintainer <yourself@somewhere.net>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
-License: CC0
+Output: rmarkdown::html_vignette
+Vignette: >
+  %\VignetteIndexEntry{rHFA_Guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+License: CC0  (Creative Commons Zero)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.2
-Suggests: 
-    knitr,
-    rmarkdown
+Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 Imports: car, nlme, Matrix, parallel, permute, sp

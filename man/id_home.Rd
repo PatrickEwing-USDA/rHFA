@@ -16,6 +16,8 @@ id_home(
 )
 }
 \arguments{
+\item{data}{data.frame of performance data by site, year, and variety, for example.}
+
 \item{site}{character, column name indicating spatial units}
 
 \item{year}{character, column name indicating temporal units}
@@ -29,8 +31,6 @@ id_home(
 \item{verbose}{logical (TRUE). Print messages?}
 
 \item{...}{other arguments passed to `method`.}
-
-\item{df}{data.frame of performance data by site, year, and variety, for example.}
 }
 \value{
 the data.frame `data` with three new columns:

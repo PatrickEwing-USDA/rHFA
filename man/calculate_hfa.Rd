@@ -10,6 +10,14 @@ calculate_hfa(x, ff, pheno, geno = NA, site = NA, year = NA)
 \item{x}{data.frame}
 
 \item{ff}{formula to use. part_pheno ~ geno */+ is_home}
+
+\item{pheno}{character, column name indicating the phenotype (ex. yield)}
+
+\item{geno}{character, column name indicating genetic units}
+
+\item{site}{character, column name indicating spatial units}
+
+\item{year}{character, column name indicating temporal units}
 }
 \description{
 calculate the home field advantage based on the formula, ff. Uses efficient

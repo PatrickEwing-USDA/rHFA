@@ -2,7 +2,7 @@
 #'
 #' @description Identify the home site based on highest relative phenotype value.
 #'
-#' @param df data.frame of performance data by site, year, and variety, for example.
+#' @param data data.frame of performance data by site, year, and variety, for example.
 #' @param site character, column name indicating spatial units
 #' @param year character, column name indicating temporal units
 #' @param geno character, column name indicating genetic units

@@ -10,6 +10,8 @@
 \item{x}{data.frame}
 
 \item{ff}{formula}
+
+\item{year}{column in data.frame `x` representing year.}
 }
 \value{
 a data.frame with the coefficients plus relevant

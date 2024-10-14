@@ -4,6 +4,7 @@
 #' 
 #' @param x data.frame
 #' @param ff formula
+#' @param year column in data.frame `x` representing year.
 #' 
 #' @details the formula should contain a term, <year>_num:is_home, and also specify a response (e.g. pheno)
 #' 

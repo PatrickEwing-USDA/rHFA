@@ -79,6 +79,10 @@ generate_sets <- function(x, site, year, times, seed = NULL) {
 #'
 #' @param x data.frame
 #' @param ff formula to use. part_pheno ~ geno */+ is_home
+#' @param site character, column name indicating spatial units
+#' @param year character, column name indicating temporal units
+#' @param geno character, column name indicating genetic units
+#' @param pheno character, column name indicating the phenotype (ex. yield)
 #'
 #' @export
 

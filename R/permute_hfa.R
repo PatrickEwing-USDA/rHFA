@@ -83,9 +83,7 @@
 #' @param geno character, column name indicating genetic units
 #' @param pheno character, column name indicating the phenotype (ex. yield)
 #'
-#' @return a data.frame of home_coefficients
-#' 
-#' @importFrom stats formula
+#' @return a data.frame of home_coefficients 
 
 .calculate_hfa <- function(x,
                            ff,
@@ -147,7 +145,7 @@
 #'
 #' @seealso `id_home()`
 #' @importFrom parallel detectCores mclapply
-#' @importFrom stats setNames na.omit
+#' @importFrom stats setNames na.omit formula
 #' 
 #' @export
 

@@ -20,7 +20,7 @@
 #' data used to identify home site.
 #'
 #' @importFrom nlme lme
-#' @importFrom stats fitted
+#' @importFrom stats fitted formula
 #' 
 #' @export
 

@@ -1,11 +1,23 @@
 Package: rHFA
 Type: Package
-Title: What the Package Does (Title Case)
+Title: rHFA: A package for conducting local adaptation analysis in time series agricultural trials
 Version: 0.9.1
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Authors@R: c(
+    person(given = "Patrick", family = "Ewing", role = c("aut", "cre"), email = "patrick@FIXTHIS.gov"),
+    person(given = "Eric", family = "Killian", role = c("aut")),
+    person(given = "Michael", family = "Kantar", role = c("aut")),
+    person(given = "Tom", family = "Glancy", role = c("edt")),
+    person(given = "Bryan", family = "Runck", role = c("aut")),
+    person(given = "Tom", family = "Kono", role = c("aut")),
+    person(given = "Alice", family = "MacQueen", role = c("aut")),
+    person(given = "Jennifer", family = "Lachowiec", role = c("aut"))
+    )
+Description: Home Field Advantage (HFA) is the fitness gain an entry (genotype) 
+  realizes by growing in its home location, which is empirically defined as the 
+  location of highest fitness relative to other entries (Ewing et al., 2019). 
+  Through identifying sites with high HFA and yield heritability, we discuss 
+  potential strategies for selection efforts to further incorporate local 
+  adaptation.
 Output: rmarkdown::html_vignette
 Vignette: >
   %\VignetteIndexEntry{rHFA_Guide}

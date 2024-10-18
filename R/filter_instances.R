@@ -87,7 +87,7 @@ autofilter_instances <- function(data, site, year, geno, min_times = 2, na.rm = 
   if (cycles >= max_cycles) {
     message("Stopped filtering after ", cycles, " cycles. Consider increasing `max_cycles`.")
   } else {
-    message("Filtered geno-years, site-years, and genos per site-year to at least ", min_times, " instances over ", cycles, ifelse(cycles > 1, " cycles.", " cycle."))
+    cat("Filtered geno-years, site-years, and genos per site-year to at least ", min_times, " instances over ", cycles, ifelse(cycles > 1, " cycles.", " cycle."))
   }
   return(out)
 }

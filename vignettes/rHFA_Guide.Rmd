@@ -14,7 +14,7 @@ vignette: >
   %\VignetteIndexEntry{rHFA Guide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
----
+--- 
 
 # Introduction
 

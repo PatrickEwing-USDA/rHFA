@@ -29,7 +29,7 @@ further incorporate local adaptation.
 
 ### How Home Field Advantage is Calculated
 
-HFA Description.
+Overall home field advantage is conceptualized as the additional yield benefit conferred to a variety after accounting for Site; year; site-by-year; entry; home site indicator; kinship PCA axes 1-3; home site-by-kinship axes. The first step is to assign each variety a “home” site, the site where a variety performed best relative to other varieties. Where is_home is an indicator for whether site j is the home site for variety i; its coefficient is the home field advantage. We then calculate variance explained by each predictor in the final Model using the Anova function in car 3.0 (Fox & Weisberg, 2019). We then used 999 permutations to test the significance of HFA (Ewing et al., 2019). A permutation test is necessary because the HFA metric is usually positive and usually explains a significant amount of variance by traditional metrics (i.e., ANOVA), even for random data. After permuting yields within site-year, we re-assigned home site and re-calculated HFA as described above. These permuted HFAs were as expected based on variation in the dataset; we compared this with the observed HFA using a two-tailed test. A home site is assigned based on the best performance (e.g. highest yield) over the course of the time series of multi-environmental trials. This metric quantifies the benefits of environmental  specialization using “home field advantage” (HFA), which was defined as the  fitness gain an organism has in its native soil (Blanquart et al., 2013). Modern crop populations lack an obvious home location, so Ewing et al. (2019) redefined HFA as the yield advantage that a crop variety receives at its best performing, “home” location, where “best” is relative to other varieties, regardless of the location of the breeding program. This definition contrasts with a variety's origin—the target region for which it was bred.
 
 # Guide
 
@@ -125,7 +125,7 @@ tools to filter the dataset to a denser subset.
 
 ### Notes about checking your data
 
-\<Mikey write some stuff?\>
+It is important for you to make sure that you examine your data for missing values, for consistancy of names accross sites, and for consistancy of variety across site. Doing checks for outliers and potentially incorrect values is also important. 
 
 ## Step 2: Filter data to a viable subset
 

@@ -144,7 +144,7 @@
 #' summarizes the results. `perms` is a matrix (or list of matrices) of permutations.
 #'
 #' @seealso `id_home()`
-#' @importFrom parallel detectCores mclapply
+#' @importFrom parallel detectCores mclapply makeCluster parLapply stopCluster clusterExport
 #' @importFrom stats setNames na.omit formula
 #' 
 #' @export
@@ -162,9 +162,23 @@ permute_hfa <- function(data,
                         seed = NULL,
                         ...) {
   
-  ncpu <- ifelse(parallel, detectCores(), 1)
   level <- match.arg(level)
+#  ncpu <- ifelse(parallel, detectCores(), 1) 
   
+# ------------------------------------------------------------------------------
+  is_windows <- grepl('mingw', version$os)
+  
+  # Set up parallel processing based on OS
+  if (parallel) {
+    if (is_windows) {
+      cl <- makeCluster(detectCores())
+      clusterExport(cl, varlist = ls(), envir = environment())
+    } else {
+      ncpu <- detectCores()
+    }
+  }
+# ------------------------------------------------------------------------------
+
   # new column names
   rel_pheno <- paste0('rel_', pheno)
   
@@ -191,41 +205,47 @@ permute_hfa <- function(data,
     dd <- split(dd, dd[, popn])
   }
   
-  # calculate relative yields
-  dd <- mclapply(dd, function(x) {
-    # calc rel_pheno and is_home
+  # Calculate relative yields
+  calculate_hfa <- function(x) {
     x <- id_home(x, site, year, geno, pheno, method, verbose = FALSE, ...)
     return(x)
-  }, mc.cores = ncpu)
+  }
   
-  # permute HFA within each population
-  results <- lapply(dd, function(x) {
-    # Set up structured permutations
+  if (parallel) {
+    if (is_windows) {
+      dd <- parLapply(cl, dd, calculate_hfa)
+    } else {
+      dd <- mclapply(dd, calculate_hfa, mc.cores = ncpu)
+    }
+  } else {
+    dd <- lapply(dd, calculate_hfa)
+  }
+
+  # Permute HFA within each population
+  perform_permutations <- function(x) {
     sets <- .generate_sets(x, site, year, times, seed)
-    
-    # Permute HFA
-    coef_permute <- do.call(cbind, mclapply(sets, function(ss) {
-      # ID home site
-      x[, c(pheno, rel_pheno)] <- x[ss, c(pheno, rel_pheno)]  # permute phenotypes within site-year
+    coef_permute <- do.call(cbind, lapply(sets, function(ss) {
+      x[, c(pheno, rel_pheno)] <- x[ss, c(pheno, rel_pheno)]
       x <- id_top_pheno(x, site = site, geno = geno, pheno = rel_pheno, method = method, verbose = FALSE, ...)
-      
-      # calculate HFA using Matrix and qr decomposition
       home_coef <- .calculate_hfa(x, ff, pheno, geno, site, year)
       return(home_coef)
-    }, mc.cores = ncpu))
-    
+    }))
     colnames(coef_permute) <- c('observed', paste0('perm', 1:(ncol(coef_permute) - 1)))
-    
-    # Calculate p-values and effects
-    test <- cbind(
-      intervals = calculate_intervals(coef_permute),
-      p_val = .two_tailed(coef_permute)
-    )
-    
-    results <- list(results = test, perms = coef_permute)
-    return(results)
-  })
+    test <- cbind(intervals = calculate_intervals(coef_permute), p_val = .two_tailed(coef_permute))
+    return(list(results = test, perms = coef_permute))
+  }
   
+  if (parallel) {
+    if (is_windows) {
+      results <- parLapply(cl, dd, perform_permutations)
+      stopCluster(cl)
+    } else {
+      results <- mclapply(dd, perform_permutations, mc.cores = ncpu)
+    }
+  } else {
+    results <- lapply(dd, perform_permutations)
+  }
+
   # format results
   if (is.null(names(results))) {
     names(results) <- paste0('popn', seq_len(length(results)))

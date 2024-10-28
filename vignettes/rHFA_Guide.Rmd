@@ -276,7 +276,7 @@ pophfa = permute_hfa(corn,
                      population=NA, # specify to run separately for each sub-population.
                      times=9, 
                      method='blup',
-                     parallel=TRUE, 
+                     parallel=FALSE, 
                      seed=73956)
 ```
 
@@ -414,7 +414,7 @@ genohfa = permute_hfa(corn,
                    pheno='YIELD',
                    times=9, 
                    method='blup',
-                   parallel=TRUE, 
+                   parallel=FALSE, 
                    seed=73956)
 ```
 
@@ -468,7 +468,7 @@ sitehfa = permute_hfa(corn,
                    pheno='YIELD',
                    times=9, 
                    method='blup',
-                   parallel=TRUE, 
+                   parallel=FALSE, 
                    seed=73956)
 ```
 
@@ -495,7 +495,7 @@ yearhfa = permute_hfa(corn,
                    pheno='YIELD',
                    times=9, 
                    method='blup',
-                   parallel=TRUE, 
+                   parallel=FALSE, 
                    seed=73956)
 ```
 

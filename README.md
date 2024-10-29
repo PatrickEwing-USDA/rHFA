@@ -10,7 +10,7 @@ Input data should be analogous to common gardens. Ex. breeding trials, multi env
 
 ## Getting Started
 
-To learn how to use `mypackage`, check out our [introduction vignette](vignettes/getting-started.html), which walks you through the core functionality.
+To learn how to use `mypackage`, check out our [introduction vignette](vignettes/rhfa-guide.Rmd), which walks you through the core functionality.
 
 1.  id_home() to identify home site (optional)
 2.  permute_hfa() to run hfa analysis. This will work at the population and genotype level and may work across years (for populations) - in progress. You currently need to manually calculate p-values for genotypes from the permutations (first column is observed; try .two-tailed()). If really slow, try setting BLUP=FALSE.

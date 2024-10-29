@@ -1,10 +1,14 @@
-# Home field advantage (hfa) analysis of local adaptation in crop populations. 
+# Home field advantage (HFA) analysis of local adaptation in crop populations. 
 
-Input data should be analogous to common gardens. Ex. breeding trials, multi environment trials, yield trials. Largely works on R 4.1, though not compiled (yet... very much in progress!). For now, you'll have to source().
+Home Field Advantage (HFA) is the fitness gain an entry (genotype) realizes by growing in its home location, which is empirically defined as the location of highest fitness relative to other entries (Ewing et al., 2019).
+
+## Requirements
+
+Input data should be analogous to common gardens. Ex. breeding trials, multi environment trials, yield trials.
+This package was tested on Linux, Windows, and macOS running R version 4.4.x
 
 ## Brief how-to:
 
-1. Install dependencies (functions will load): `libs = c("magrittr", "car", "lme4", "Matrix", "parallel", "permute"); for (i in libs) install.packages(i)`
 1. id_home() to identify home site (optional)
 2. permute_hfa() to run hfa analysis. This will work at the population and genotype level and may work across years (for populations) - in progress. You currently need to manually calculate p-values for genotypes from the permutations (first column is observed; try .two-tailed()). If really slow, try setting BLUP=FALSE.
 3. temporal_hfa() for calculationg hfa across years at the population level.

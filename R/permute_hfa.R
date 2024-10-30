@@ -206,6 +206,7 @@ permute_hfa <- function(data,
   }
   
   # Calculate relative yields
+  # ------ TODO: add ellipses and pass them to parLapply for passing objects to fork environments.
   calculate_hfa <- function(x) {
     x <- id_home(x, site, year, geno, pheno, method, verbose = FALSE, ...)
     return(x)
@@ -222,6 +223,7 @@ permute_hfa <- function(data,
   }
 
   # Permute HFA within each population
+  # ----- TODO: move parallelization to after generate_sets, not at population level.
   perform_permutations <- function(x) {
     sets <- .generate_sets(x, site, year, times, seed)
     coef_permute <- do.call(cbind, lapply(sets, function(ss) {

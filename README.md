@@ -4,13 +4,13 @@ Home Field Advantage (HFA) is the fitness gain an entry (genotype) realizes by g
 
 ### Requirements 
 
-Input data should be analogous to common gardens. Ex. breeding trials, multi-environment trials, yield trials. This package was tested on Linux, Windows, and macOS running R version 4.4.x
+Input data should be analogous to common gardens. Ex. breeding trials, multi-environment trials, yield trials. This package was tested on Linux, Windows, and macOS running R version 4.4.x.
 
 ### Brief how-to:
 
-1.  id_home() to identify home site (optional)
-2.  permute_hfa() to run hfa analysis. This will work at the population and genotype level and may work across years (for populations) - in progress. You currently need to manually calculate p-values for genotypes from the permutations (first column is observed; try .two-tailed()). If really slow, try setting BLUP=FALSE.
-3.  temporal_hfa() for calculationg hfa across years at the population level.
+1.  permute_hfa() to run hfa analysis. This will work at the population genotype, site, and year level. See obj$
+2.  id_home() to identify home site of each genotype
+3.  specialist_test() and generalist_test() to identify specialists and generalists.
 
 See analysis code for publications below and methods described in those publications - especially Ewing et al. (2019). All functions are relatively documented in source code.
 

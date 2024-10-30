@@ -8,13 +8,11 @@ Input data should be analogous to common gardens. Ex. breeding trials, multi-env
 
 ### Brief how-to:
 
-1.  permute_hfa() to run hfa analysis. This will work at the population genotype, site, and year level. See obj$
-2.  id_home() to identify home site of each genotype
+1.  permute_hfa() to run hfa analysis. This will work at the population genotype, site, and year level.
+2.  id_home() to return the home site of each genotype
 3.  specialist_test() and generalist_test() to identify specialists and generalists.
 
-See analysis code for publications below and methods described in those publications - especially Ewing et al. (2019). All functions are relatively documented in source code.
-
-The median (quantile) regression approach of Ewing et al. (2019) has not yet been transferred to this package - only ordinary least squares (`lm()`-based) and BLUP (`lmer()`-based) are. Of the two, BLUP is more robust to low sample sizes (site-years per genotype) and outliers but also is substantially slower.
+See analysis code for publications below and methods described in those publications - especially (Ewing et al. (2019))[https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0227079].
 
 Of course, message with questions.
 

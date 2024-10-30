@@ -12,7 +12,7 @@ Input data should be analogous to common gardens. Ex. breeding trials, multi-env
 2.  id_home() to return the home site of each genotype
 3.  specialist_test() and generalist_test() to identify specialists and generalists.
 
-See analysis code for publications below and methods described in those publications - especially (Ewing et al. (2019))[https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0227079].
+See analysis code for publications below and methods described in those publications - especially [Ewing et al. (2019)](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0227079).
 
 Of course, message with questions.
 

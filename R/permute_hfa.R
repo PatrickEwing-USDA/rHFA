@@ -185,9 +185,9 @@ permute_hfa <- function(data,
   # formula for calculating HFA effect
   ff <- switch(level,
                'population' = ' ~ site*year + geno + is_home',  # overall HFA
-               'genotype' = ' ~ site*year + geno + geno:is_home',
-               'year' = '~ site*year + geno + year:is_home',  # is this right?
-               'site' = '~ year*site + geno + site:is_home')  # is this right? HFA for each genotype
+               'genotype' = ' ~ site*year + geno + geno:is_home',  # hfa for each genotype
+               'year' = '~ site*year + geno + year:is_home',  # HFA for each year 
+               'site' = '~ year*site + geno + site:is_home')  # HFA for each site
   
   ff <- formula(gsub('geno', geno, gsub('year', year, gsub('site', site, ff))))
   
@@ -206,6 +206,7 @@ permute_hfa <- function(data,
   }
   
   # Calculate relative yields
+  # ------ TODO: add ellipses and pass them to parLapply for passing objects to fork environments.
   calculate_hfa <- function(x) {
     x <- id_home(x, site, year, geno, pheno, method, verbose = FALSE, ...)
     return(x)
@@ -222,6 +223,7 @@ permute_hfa <- function(data,
   }
 
   # Permute HFA within each population
+  # ----- TODO: move parallelization to after generate_sets, not at population level.
   perform_permutations <- function(x) {
     sets <- .generate_sets(x, site, year, times, seed)
     coef_permute <- do.call(cbind, lapply(sets, function(ss) {
@@ -252,8 +254,10 @@ permute_hfa <- function(data,
   }
   
   if (level == 'population') {
-    test_results <- rownames(do.call(rbind, lapply(results, function(x) x$results)), names(results))
-    perms <- rownames(do.call(rbind, lapply(results, function(x) x$perms)), names(results))
+    test_results <- do.call(rbind, lapply(results, function(x) x$results))
+    rownames(test_results) <- names(results)
+    perms <- do.call(rbind, lapply(results, function(x) x$perms))
+    rownames(perms) <- names(results)
   } else {
     lvl <- switch(level, 'genotype' = geno, 'year' = year, 'site' = site)
     test_results <- do.call(rbind, lapply(names(results), function(x) {

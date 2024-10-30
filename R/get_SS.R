@@ -48,7 +48,7 @@ get_ss <- function(model, test.statistic = 'F', ...) {
   
   # Set 'is_home' p-value to NA if applicable
   if ("is_home" %in% rownames(out)) {
-    out["is_home", "p_value"] <- NA
+    out["is_home", "Pr(>F)"] <- NA
   }
   
   return(out)

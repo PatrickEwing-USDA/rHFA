@@ -4,17 +4,15 @@ Home Field Advantage (HFA) is the fitness gain an entry (genotype) realizes by g
 
 ### Requirements 
 
-Input data should be analogous to common gardens. Ex. breeding trials, multi-environment trials, yield trials. This package was tested on Linux, Windows, and macOS running R version 4.4.x
+Input data should be analogous to common gardens. Ex. breeding trials, multi-environment trials, yield trials. This package was tested on Linux, Windows, and macOS running R version 4.4.x.
 
 ### Brief how-to:
 
-1.  id_home() to identify home site (optional)
-2.  permute_hfa() to run hfa analysis. This will work at the population and genotype level and may work across years (for populations) - in progress. You currently need to manually calculate p-values for genotypes from the permutations (first column is observed; try .two-tailed()). If really slow, try setting BLUP=FALSE.
-3.  temporal_hfa() for calculationg hfa across years at the population level.
+1.  permute_hfa() to run hfa analysis. This will work at the population genotype, site, and year level.
+2.  id_home() to return the home site of each genotype
+3.  specialist_test() and generalist_test() to identify specialists and generalists.
 
-See analysis code for publications below and methods described in those publications - especially Ewing et al. (2019). All functions are relatively documented in source code.
-
-The median (quantile) regression approach of Ewing et al. (2019) has not yet been transferred to this package - only ordinary least squares (`lm()`-based) and BLUP (`lmer()`-based) are. Of the two, BLUP is more robust to low sample sizes (site-years per genotype) and outliers but also is substantially slower.
+See analysis code for publications below and methods described in those publications - especially (Ewing et al. (2019))[https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0227079].
 
 Of course, message with questions.
 

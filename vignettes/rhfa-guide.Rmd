@@ -33,60 +33,98 @@ vignette: >
 
 Home Field Advantage (HFA) is the fitness gain an entry (genotype)
 realizes by growing in its home location, which is empirically defined
-as the location of highest fitness relative to other entries (Ewing et
-al., 2019). Through identifying sites with high HFA and yield
-heritability, we discuss potential strategies for selection efforts to
-further incorporate local adaptation.
+as the location of highest fitness relative to other entries ([Ewing *et
+al*.,
+2019](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0227079)).
+At the population level, i.e. averaged across members of a population,
+it can indicate population adaptation strategy and, for bred
+populations, the preferences of the breeder. We also can evaluate how
+this adaptation has changed across time among populations. Finally, we
+can use it to identify specialist and generalist genotypes. When
+combined with, for example, kinship, heritability ((MacQueen *et al*.,
+2021)[<https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.20694>])
+or genetic potential ((Ewing *et al*.,
+2024)[<https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.21168>]),
+HFA allows novel insights into population structure and breeding
+strategy.
 
 ### How Home Field Advantage is Calculated
 
-Overall home field advantage is conceptualized as the additional yield
-benefit conferred to a variety after accounting for Site; year;
-site-by-year; entry; home site indicator; kinship PCA axes 1-3; home
-site-by-kinship axes. The first step is to assign each variety a “home”
-site, the site where a variety performed best relative to other
-varieties. Where is_home is an indicator for whether site j is the home
-site for variety i; its coefficient is the home field advantage. We then
-calculate variance explained by each predictor in the final Model using
-the Anova function in car 3.0 (Fox & Weisberg, 2019). We then used 999
-permutations to test the significance of HFA (Ewing et al., 2019). A
-permutation test is necessary because the HFA metric is usually positive
-and usually explains a significant amount of variance by traditional
-metrics (i.e., ANOVA), even for random data. After permuting yields
-within site-year, we re-assigned home site and re-calculated HFA as
-described above. These permuted HFAs were as expected based on variation
-in the dataset; we compared this with the observed HFA using a
-two-tailed test. A home site is assigned based on the best performance
-(e.g. highest yield) over the course of the time series of
-multi-environmental trials. This metric quantifies the benefits of
-environmental specialization using “home field advantage” (HFA), which
-was defined as the fitness gain an organism has in its native soil
-(Blanquart et al., 2013). Modern crop populations lack an obvious home
-location, so Ewing et al. (2019) redefined HFA as the yield advantage
-that a crop variety receives at its best performing, “home” location,
-where “best” is relative to other varieties, regardless of the location
-of the breeding program. This definition contrasts with a variety's
-origin—the target region for which it was bred.
+Overall home field advantage is conceptualized as the average additional
+yield benefit conferred to a variety when growing at it's home location
+after accounting for site, year, site-by-year, and genetic potential.
+Begin with:
+
+Eq. 1:
+$phenotype_{ijk} = genotype_i + site_j + year_k + site_j \times year_k + is\_home_{ij} + \epsilon_{ijk}$
+
+Where *is_home* is an indicator for whether site *j* is the home site
+for variety *i*; its coefficient is the home field advantage (HFA)
+across genotypes within the population. This metric quantifies the
+benefits of environmental specialization using “home field advantage”
+(HFA), which was defined as the fitness gain an organism has in its
+native soil ((Blanquart *et al*.,
+2013)[<https://doi.org/10.1111/ele.12150>]). Modern crop populations
+lack an obvious home location, so (Ewing *et al*.
+(2019))[<https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0227079>]
+redefined HFA as the yield advantage that a crop variety receives at its
+best performing, “home” location, where “best” is relative to other
+varieties, regardless of the location of the breeding program. This
+definition contrasts with a variety's origin—the target region for which
+it was bred.
+
+Since "home" was picked as a good site, we expect this to be a positive
+coefficient. The real question is, was HFA larger than expected. This is
+tested using permutation. In this case, values of *phenotype* are
+permuted within site-year. By calculating HFA on this permuted data a
+bunch of times, we can estimate what we'd expect HFA to be based on
+chance and the variation in the dataset. Larger-than-expected HFA are
+indicative of local adaptation, while smaller-than-expected HFA are
+indicative of broad adaptation.
+
+Finally, with wild data - where sites and genotypes may change or may
+not be fully crossed - finding a "best" site is more challenging. rHFA
+provides a few ways to identify the home site:
+
+-   A best linear unbiased predictor (BLUP) of relative performance in a
+    given site-year. This is via a random intercept model using
+    `nlme::lme()`. Because it accounts for certainty (i.e. more measures
+    of each hybrid-site combination) it's best for unbalanced, sparse,
+    and highly variable data. But it's also slow.
+
+<!-- -->
+
+-   Raw means (within site across year). Fast, for balanced,
+    well-behaved (i.e. normal-ish) data with a deeper time series at
+    each site and for each genotype.
+-   Median. Fast, for highly and non-normally variable, relatively dense
+    data with a deeper time series at each site and for each genotype.
+-   You can also provide your own, generic function. See
+    `help('id_home')`.
+
+Note that home site assignments and effect sizes will differ among the
+modeling approaches, especially for sparser datasets.
 
 # Guide
 
-## Step 1: Acquire dataset
+## Step 1: Acquire data
 
-Data must be in long format containing the plant variety and data from
-each location:
+Data can be acquired from a number of common garden-like designs. They
+must be in long format containing the plant variety and data from
+multiple years at each location.
 
 ```{r}
 library(rHFA)
 
-in_corn = system.file('extdata', 'illinois_corn_yield.csv', package = "rHFA")
-corn = read.csv(in_corn)
+in_corn <- system.file('extdata', 'illinois_corn_yield.csv', package = "rHFA")
+corn <- read.csv(in_corn)
 
 # convert columns to factors
-facts = c('YEAR', 'COMPANY', 'HYBRID', 'SITE')
-corn[facts] = lapply(corn[facts], as.factor)
+facts <- c('YEAR', 'COMPANY', 'HYBRID', 'SITE')
+corn[facts] <- lapply(corn[facts], as.factor)
 
 head(corn, 10)
-corn_full = corn
+corn_full <- corn  # to access the original data later
 ```
 
 ```{r}
@@ -97,23 +135,22 @@ This dataset is a subset of the corn variety trials conducted by the
 University of Illinois Extension. Yield is in bushels per acre. For
 those keeping track, one standard bushel is 56 pounds.
 
-Note that this is a ***tall*** dataframe. Columns and corresponding
-arguments in `rHFA` functions:
+Note that this is a ***tall*** dataframe. Columns and
+`corresponding arguments` in `rHFA` functions are:
 
--   YEAR (*factor*): `year` instance of data collection - likley year.
+-   YEAR (*factor*): `year` instance of data collection - likely year.
 -   COMPANY (*factor*): `popn` differentiates subpopulations within the
     dataset. In this case, company that entered the hybrid.
 -   HYBRID (*factor*): `geno` Hybrid (genotype) identifier.
--   IS_CHECK: Unique to this dataset. Flag for whether a line is a
-    "check" line - i.e. grown in all locations in a given year.
 -   SITE (*factor*): `site`, the location of data collection.
 -   YIELD (*numeric*):`pheno`, the phenotype of interest. Here, a
-    hybrid's average yield across replicates within the site-year
+    hybrid's average yield across replicates within the site-year.
 
-The design is somewhere between an augmented block and a common garden
-experiment: a population of commercial hybrids was grown across
+The original design is somewhere between an augmented block and a common
+garden experiment: a population of commercial hybrids was grown across
 locations, only the "checks" were grown in each location in a given
-year. We have already subsetted the dataset to include only those
+year, but checks, hybrids, and even locations changed across the
+experiment. We have already subsetted the dataset to include only those
 checks.
 
 The rate of turnover varies among hybrids and sites. As a result, this
@@ -129,7 +166,7 @@ You can see sites were used in as few as one year, while some were used
 in all 19 years.
 
 ```{r}
-count_instances(corn, 'HYBRID', 'YEAR', TRUE) |>
+count_instances(corn, 'HYBRID', 'YEAR') |>
   summary()
 ```
 
@@ -141,31 +178,17 @@ problems in reliable identification of home site - which is the critical
 step of HFA analysis. The most robust home site assignments will be
 robust to weather variation, so multiple years is essential. rHFA
 provides access to different modeling approaches to identify "home".
-These are:
-
--   A best linear unbiased predictor (BLUP) of relative performance in a
-    given site-year. This is via a random intercept model using
-    `nlme::lme()`. Because it accounts for certainty (i.e. more measures
-    of each hybrid-site combination) it's best for unbalanced, sparse,
-    and highly variable data. But it's also slow.
--   Raw means (within site across year). Fast, for balanced,
-    well-behaved (i.e. normal-ish) data with a deeper time series at
-    each site and for each genotype.
--   Median. Fast, for highly and non-normally variable, relatively dense
-    data with a deeper time series at each site and for each genotype.
--   You can also provide your own, generic function. See
-    `help('id_home')`.
-
-Note that home site assignments and effect sizes will differ among the
-modeling approaches, especially for sparser datasets. rHFA also provides
-tools to filter the dataset to a denser subset.
+Still, you probably will want to filter your data a bit to ensure
+adequate replication. rHFA provides tools to filter the dataset to a
+denser subset.
 
 ### Notes about checking your data
 
 It is important for you to make sure that you examine your data for
-missing values, for consistancy of names accross sites, and for
-consistancy of variety across site. Doing checks for outliers and
-potentially incorrect values is also important.
+missing values, for consistency of names across sites, and for
+consistency of varieties across sites. Doing checks for outliers and
+potentially incorrect values is also important. Do this **before**
+filtering to a viable subset!
 
 ## Step 2: Filter data to a viable subset
 
@@ -193,7 +216,7 @@ hybrid, site, and year. For example, to filter hybrids to those grown in
 at least two years leaves us with:
 
 ```{r}
-corn = filter_instances(
+corn <- filter_instances(
   data=corn,
   group_col='HYBRID',
   rep_col='YEAR',
@@ -205,13 +228,13 @@ count_instances(corn, 'HYBRID', 'YEAR', TRUE) |>
   summary()
 ```
 
-This gives us `r length(levels(corn$HYBRID))` hybrids to work with, down
-from `r length(unique(corn$HYBRID))`.
+This gives us `r length(levels(corn$HYBRID))` hybrids to work with,
+versus `r length(unique(corn_full$HYBRID))` in the original data.
 
 Doing the same for site:
 
 ```{r}
-corn = filter_instances(
+corn <- filter_instances(
   data=corn,
   group_col='SITE',
   rep_col='YEAR',
@@ -229,10 +252,10 @@ Leaving `r length(unique(corn$SITE))` sites, down from
 And we need at least 2 hybrids grown in each site-year.
 
 ```{r}
-corn$SITEYEAR = with(corn, 
+corn$SITEYEAR <- with(corn, 
                      paste(SITE, YEAR, sep='_'))
 
-corn = filter_instances(corn,
+corn <- filter_instances(corn,
                         group_col='SITEYEAR',
                         rep_col='HYBRID',
                         min_times=2,
@@ -253,12 +276,13 @@ within site-year). To demonstrate, we'll increase the minimum number of
 instances to 3 using the `min_times` argument.
 
 ```{r}
-test = autofilter_instances(corn, 'SITE', 'YEAR', 'HYBRID', min_times=3, max_cycles=999)
+test <- autofilter_instances(corn, 'SITE', 'YEAR', 'HYBRID', min_times=3, max_cycles=999)
 ```
 
 Note that `autofilter_instances()` repeated itself for a total of two
 cycles. This is because filtering, for example, hybrids within site-year
 may reduce the occurrence of site-years to fewer than `min_times`.
+`autofilter_instances()` will repeat itself until the dataset is stable.
 
 The data is now ready for home field advantage analysis. You can skip
 right to Step 5, `permute_HFA()`, to estimate and test HFA immediately.
@@ -269,16 +293,11 @@ The following builds into that.
 We're ready to run the HFA analysis. You really just need one function
 to do this: `permute_hfa()`. The default is to run this at the
 population level. For meta-populations with sub-populations (for
-example, domestication events of dry bean), specify a column that
-differentiates them.
-
-As the function suggests, this is a permutation test. Because the HFA
-algorithm first identifies sites where a genotype performs relatively
-well, we expect a positive effect of growing at that site. The real
-question is, is the positive effect larger than expected?
+example, domestication events of dry bean or individual breeding
+programs), specify a column that differentiates them.
 
 ```{r}
-pophfa = permute_hfa(corn,
+pophfa <- permute_hfa(corn,
                      level='population',  # default
                      site='SITE',
                      year='YEAR',
@@ -292,7 +311,7 @@ pophfa = permute_hfa(corn,
 ```
 
 For speed reasons, we'll limit ourselves to 9 permutations (plus the
-observed data). In practice, use *at least* 99.
+observed data). In practice, use *at least* 99, preferably 999.
 
 Now, look at results. `permute_hfa()` returns a list with three objects:
 
@@ -306,15 +325,12 @@ pophfa$home_field
 ```
 
 For the entire population, the observed HFA was 12.1 bushels per acre, a
-
-FIX this equation --\> r round(pophfa$home_field[1, 1]/mean(corn$YIELD),
-3)\*100
-
-\% increase over the average corn yield in this dataset. However, this
-was about 1.3 bushels per acre less than expected (90% confidence
-interval: -2.2 to -0.2 bushels per acre). Every permutation's HFA was
-larger than the observed HFA (*p* = 0), which you can verify by looking
-at the permutations themselves:
+`r round(pophfa$home_field[1, 1]/mean(corn$YIELD), 3)*100`% increase
+over the average corn yield in this dataset. However, this was about 1.3
+bushels per acre less than expected (90% confidence interval: -2.2 to
+-0.2 bushels per acre). Every permutation's HFA was larger than the
+observed HFA (*p* = 0), which you can verify by looking at the
+permutations themselves:
 
 ```{r}
 pophfa$perms
@@ -346,16 +362,15 @@ You might wonder how important this HFA is relative to other factors,
 say, location or genotype. The `get_ss()` function will do this.
 
 ```{r}
-mod = lm(pophfa$formula, 
+mod <- lm(pophfa$formula, 
          data=pophfa$data)
-ss = get_ss(mod)
+ss <- get_ss(mod)
 ss
 ```
 
 Home site explains
 
-FIX THIS STATEMENT ----\> r round(ss['is_home', 'pct Var'], 2) % of
-total variance. Not much.
+`r round(ss['is_home', 'Percent Var'], 2)`% of total variance. Not much.
 
 P-values here are from the package, `car`, based on the indicated *F*
 test. `get_ss()` is just a wrapper for `car::Anova()`.
@@ -383,13 +398,13 @@ use `id_home()`, which produces the `data.frame` of the permutations
 results (`pophfa$data`).
 
 ```{r message=FALSE, warning=FALSE}
-corn_home = id_home(
+corn_home <- id_home(
   data=corn,
   site='SITE',
   year='YEAR', 
   geno='HYBRID', 
   pheno='YIELD',
-  method='blup',     # need to update this to a switch to include median.
+  method='blup',
   verbose=FALSE
 ) 
 subset(corn_home, HYBRID == corn[110, 'HYBRID']) |>
@@ -402,13 +417,12 @@ As a gut check, let's look at relative yield at home sites.
 aggregate(rel_YIELD ~ SITE + HYBRID, 
           data=corn_home,
           subset=is_home,
-          # data=subset(corn_home, is_home), 
           FUN=mean) |>
   summary()
 ```
 
-Lines at home tend to perform better than average at that location
-(rel_YIELD \> 0).
+Lines at home tend to perform better than average at that location (V1 =
+rel_YIELD \> 0).
 
 ## Specialists and generalists
 
@@ -417,7 +431,7 @@ identify specialists (higher HFA than expected) and generalists (lower
 HFA than expected).
 
 ```{r}
-genohfa = permute_hfa(corn,
+genohfa <- permute_hfa(corn,
                    level='genotype',
                    site='SITE',
                    year='YEAR',
@@ -433,7 +447,7 @@ The default test values here are whether the observed HFA is different
 from permutations:
 
 ```{r}
-genohfa_test = genohfa$home_field
+genohfa_test <- genohfa$home_field
 head(genohfa_test)
 ```
 
@@ -441,7 +455,7 @@ Based on raw p-values, we find these genotypes have an HFA different
 from zero:
 
 ```{r}
-tt = genohfa_test$p_val < 0.05
+tt <- genohfa_test$p_val < 0.05
 genohfa_test[tt, ]
 ```
 
@@ -450,8 +464,10 @@ Since all HFA are smaller than expected, we these are probably
 have a lot of comparisons. In practice, do this with more permutations.
 
 ```{r}
-genohfa_test$p_adj = p.adjust(genohfa_test$p_val, method='fdr')
-tt = genohfa_test$p_val < 0.05
+genohfa_test$p_adj <- p.adjust(genohfa_test$p_val, 
+                               method='fdr')
+
+tt <- genohfa_test$p_val < 0.05
 genohfa_test[tt, ]
 ```
 
@@ -460,7 +476,7 @@ are *generalists*. We can test this using a one-tailed test for each
 generalists and specialists.
 
 ```{r}
-geno_hfa = specialist_test(genohfa) |>
+geno_hfa <- specialist_test(genohfa) |>
   generalist_test()
 head(geno_hfa$home_field)
 ```
@@ -471,7 +487,7 @@ hypothesis (specialist/generalist due to chance) is true.
 ## Spatial variation in HFA
 
 ```{r}
-sitehfa = permute_hfa(corn,
+sitehfa <- permute_hfa(corn,
                    level='site',
                    site='SITE',
                    year='YEAR',
@@ -490,7 +506,7 @@ sitehfa$home_field
 These are the advantages conferred to home lines at each site. Again,
 results suggest generalist populations. Still:
 
--   Belleville may be an environmentally distinct location, as HFA is
+-   Mt. Morris may be an environmentally distinct location, as HFA is
     higher than expected.
 -   Goodfield may be especially representative, with an extremely low
     HFA.
@@ -498,7 +514,7 @@ results suggest generalist populations. Still:
 ## Temporal variation in HFA
 
 ```{r}
-yearhfa = permute_hfa(corn,
+yearhfa <- permute_hfa(corn,
                    level='year',
                    site='SITE',
                    year='YEAR',
@@ -517,7 +533,7 @@ yearhfa$home_field
 We don't see an obvious trend here, but plotting may help:
 
 ```{r}
-yhfa = yearhfa$home_field
+yhfa <- yearhfa$home_field
 plot(as.numeric(yhfa$YEAR), 
      yhfa$observed,
      xlab='Year',
@@ -545,7 +561,7 @@ HFA has not changed across years.
 
 ------------------------------------------------------------------------
 
-## *The following sections are under construction...*
+# *The following sections are under construction...*
 
 ------------------------------------------------------------------------
 
@@ -567,11 +583,11 @@ If you get errors, check that:
 
 ```{r}
 
-corn_sites = system.file('extdata', 'illinois_sites.csv', package = "rHFA")
-corn_sites = read.csv(corn_sites)
-
-names(corn_sites) = gsub('City', 'SITE', names(corn_sites))
-corn_sites[, 'SITE'] = tolower(corn_sites[, 'SITE'])
+# corn_sites = system.file('extdata', 'illinois_sites.csv', package = "rHFA")
+# corn_sites = read.csv(corn_sites)
+# 
+# names(corn_sites) = gsub('City', 'SITE', names(corn_sites))
+# corn_sites[, 'SITE'] = tolower(corn_sites[, 'SITE'])
 
 # home_dist = home_distance_spatial(
 #   data=corn,
@@ -607,6 +623,9 @@ These units are fairly meaningless.
 
 ## Kinship among genotypes and other covariates {.color: .lightgray}
 
+Add a "covariates" argument to allow inserting a generic covariate to
+the equations. ex. covariate="is_home\*kinpc1"
+
 ```{r}
 #
 #
@@ -617,3 +636,7 @@ These units are fairly meaningless.
 ------------------------------------------------------------------------
 
 # Graphics {style="color: lightgray"}
+
+Arrows plot.
+
+HFA vs yield potential.

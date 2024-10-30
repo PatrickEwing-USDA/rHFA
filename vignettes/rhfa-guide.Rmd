@@ -228,8 +228,8 @@ count_instances(corn, 'HYBRID', 'YEAR', TRUE) |>
   summary()
 ```
 
-This gives us `{r} length(levels(corn$HYBRID))` hybrids to work with,
-versus `{r} length(unique(corn_full$HYBRID))` in the original data.
+This gives us `r length(levels(corn$HYBRID))` hybrids to work with,
+versus `r length(unique(corn_full$HYBRID))` in the original data.
 
 Doing the same for site:
 
@@ -583,11 +583,11 @@ If you get errors, check that:
 
 ```{r}
 
-corn_sites = system.file('extdata', 'illinois_sites.csv', package = "rHFA")
-corn_sites = read.csv(corn_sites)
-
-names(corn_sites) = gsub('City', 'SITE', names(corn_sites))
-corn_sites[, 'SITE'] = tolower(corn_sites[, 'SITE'])
+# corn_sites = system.file('extdata', 'illinois_sites.csv', package = "rHFA")
+# corn_sites = read.csv(corn_sites)
+# 
+# names(corn_sites) = gsub('City', 'SITE', names(corn_sites))
+# corn_sites[, 'SITE'] = tolower(corn_sites[, 'SITE'])
 
 # home_dist = home_distance_spatial(
 #   data=corn,

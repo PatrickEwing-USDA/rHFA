@@ -3,7 +3,7 @@ Type: Package
 Title: rHFA: A package for conducting local adaptation analysis in time series agricultural trials
 Version: 0.9.1
 Authors@R: c(
-    person(given = "Patrick", family = "Ewing", role = c("aut", "cre"), email = "patrick@FIXTHIS.gov"),
+    person(given = "Patrick", family = "Ewing", role = c("aut", "cre"), email = "patrick.ewing@usda.gov"),
     person(given = "Eric", family = "Killian", role = c("aut")),
     person(given = "Michael", family = "Kantar", role = c("aut")),
     person(given = "Tom", family = "Glancy", role = c("edt")),

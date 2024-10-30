@@ -23,7 +23,7 @@ Vignette: >
   %\VignetteIndexEntry{rHFA_Guide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-License: CC0
+License: file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 Suggests: knitr, rmarkdown

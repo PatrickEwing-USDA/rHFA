@@ -290,8 +290,6 @@ The following builds into that.
 
 ## Step 3: Permute HFA
 
-#---- TODO: population-level output doesn't give the right results
-
 We're ready to run the HFA analysis. You really just need one function
 to do this: `permute_hfa()`. The default is to run this at the
 population level. For meta-populations with sub-populations (for
@@ -359,8 +357,6 @@ Three new columns are here for your inspection:
     sites as home or not.
 
 ## Step 4: Variance explained
-
-# -----TODO: Fix this output. Why the extra column?
 
 You might wonder how important this HFA is relative to other factors,
 say, location or genotype. The `get_ss()` function will do this.
@@ -565,7 +561,7 @@ HFA has not changed across years.
 
 ------------------------------------------------------------------------
 
-## *The following sections are under construction...*
+# *The following sections are under construction...*
 
 ------------------------------------------------------------------------
 

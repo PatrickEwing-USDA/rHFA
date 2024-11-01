@@ -18,7 +18,7 @@ The rHFA Guide vignette contains a step-by-step analysis of sample data. When in
 
 See analysis code for publications below and methods described in those publications - especially Ewing *et al*. (2019).
 
-Of course, message with questions.
+Of course, message with questions. If you have ideas for enhancements, please suggest/contribute!
 
 ### Publications:
 

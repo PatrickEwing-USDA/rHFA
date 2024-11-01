@@ -41,10 +41,10 @@ it can indicate population adaptation strategy and, for bred
 populations, the preferences of the breeder. We also can evaluate how
 this adaptation has changed across time among populations. Finally, we
 can use it to identify specialist and generalist genotypes. When
-combined with, for example, kinship, heritability ((MacQueen *et al*.,
-2021)[<https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.20694>])
-or genetic potential ((Ewing *et al*.,
-2024)[<https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.21168>]),
+combined with, for example, kinship, heritability ([MacQueen *et al*.,
+2021](https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.20694])
+or genetic potential ([Ewing *et al*.,
+2024](https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.21168),
 HFA allows novel insights into population structure and breeding
 strategy.
 
@@ -275,7 +275,12 @@ within site-year). To demonstrate, we'll increase the minimum number of
 instances to 3 using the `min_times` argument.
 
 ```{r}
-test <- autofilter_instances(corn, 'SITE', 'YEAR', 'HYBRID', min_times=3, max_cycles=999)
+test <- autofilter_instances(corn, 
+                             site='SITE', 
+                             year='YEAR', 
+                             geno='HYBRID', 
+                             min_times=3, 
+                             max_cycles=999)
 ```
 
 Note that `autofilter_instances()` repeated itself for a total of two
@@ -364,7 +369,7 @@ say, location or genotype. The `get_ss()` function will do this.
 
 ```{r message=FALSE}
 mod <- lm(pophfa$formula, 
-         data=pophfa$data)
+          data=pophfa$data)
 ss <- get_ss(mod)
 ss
 ```
@@ -379,7 +384,7 @@ test. `get_ss()` is just a wrapper for `car::Anova()`.
 
 ## Step 5: ID home site
 
-To quickly match home site with a hybrid, use `get_home_site()`:
+To quickly match home site with a genotype, use `get_home_site()`:
 
 ```{r}
 get_home_site(pophfa$data, 
@@ -434,15 +439,15 @@ HFA than expected).
 
 ```{r}
 genohfa <- permute_hfa(corn,
-                   level='genotype',
-                   site='SITE',
-                   year='YEAR',
-                   geno='HYBRID',
-                   pheno='YIELD',
-                   times=9, 
-                   method='blup',
-                   parallel=FALSE, 
-                   seed=73956)
+                       level='genotype',
+                       site='SITE',
+                       year='YEAR',
+                       geno='HYBRID',
+                       pheno='YIELD',
+                       times=9, 
+                       method='blup',
+                       parallel=FALSE, 
+                       seed=73956)
 ```
 
 The default test values here are whether the observed HFA is different
@@ -492,15 +497,15 @@ To identify the average HFA conferred at each site (for home genotypes), set
 
 ```{r}
 sitehfa <- permute_hfa(corn,
-                   level='site',
-                   site='SITE',
-                   year='YEAR',
-                   geno='HYBRID',
-                   pheno='YIELD',
-                   times=9, 
-                   method='blup',
-                   parallel=FALSE, 
-                   seed=73956)
+                       level='site',
+                       site='SITE',
+                       year='YEAR',
+                       geno='HYBRID',
+                       pheno='YIELD',
+                       times=9, 
+                       method='blup',
+                       parallel=FALSE, 
+                       seed=73956)
 ```
 
 ```{r}
@@ -523,15 +528,15 @@ results suggest generalist populations. Running `specialist_test()` and `
 
 ```{r}
 yearhfa <- permute_hfa(corn,
-                   level='year',
-                   site='SITE',
-                   year='YEAR',
-                   geno='HYBRID',
-                   pheno='YIELD',
-                   times=9, 
-                   method='blup',
-                   parallel=FALSE, 
-                   seed=73956)
+                       level='year',
+                       site='SITE',
+                       year='YEAR',
+                       geno='HYBRID',
+                       pheno='YIELD',
+                       times=9, 
+                       method='blup',
+                       parallel=FALSE, 
+                       seed=73956)
 ```
 
 ```{r}
@@ -546,8 +551,6 @@ plot(as.numeric(yhfa$YEAR),
      yhfa$observed,
      xlab='Year',
      ylab='HFA')
-# points(as.numeric(yhfa$YEAR), 
-#        yhfa$observed)
 points(as.numeric(yhfa$YEAR),
        yhfa$observed - yhfa$diff_q50, col='red')
 legend('topright',

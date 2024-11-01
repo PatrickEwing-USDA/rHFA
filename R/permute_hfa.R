@@ -171,6 +171,9 @@ permute_hfa <- function(data,
   # Set up parallel processing based on OS
   if (parallel) {
     if (is_windows) {
+      message("Parallel processing isn't quite implemented for Windows. Running in series.")
+      parallel <- FALSE
+      
       cl <- makeCluster(detectCores())
       clusterExport(cl, varlist = ls(), envir = environment())
     } else {

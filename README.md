@@ -8,9 +8,9 @@ Input data should be analogous to common gardens. Ex. breeding trials, multi-env
 
 ### Brief how-to:
 
-1.  permute_hfa() to run hfa analysis. This will work at the population, genotype, site, and year level.
-2.  id_home() to return the home site of each genotype
-3.  specialist_test() and generalist_test() to identify specialists and generalists.
+1.  `permute_hfa()` to run hfa analysis. This will work at the population, genotype, site, and year level.
+2.  `id_home()` to return the home site of each genotype
+3.  `specialist_test()` and `generalist_test()` to identify specialists and generalists.
 
 The rHFA Guide vignette contains a step-by-step analysis of sample data. When installing the package from github, use this command to ensure the vignette is included.
 

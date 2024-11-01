@@ -34,7 +34,7 @@ See analysis code for publications below and methods described in those publicat
 rHFA is still under development! The following are known issues:
 
 1. Parallel processing is disabled for windows currently.
-2. When `method="blup"`, permutation testing may stop on error or the significance test may produce an NA. These are related issues. Either increase min_times in `*filter_instances()` or try a different method, such as `method='median'`.
+2. When `method="blup"`, permutation testing with `permute_hfa()` may stop on error or the significance test may produce an NA. These are related issues. Either increase `min_times` in `*filter_instances()` or try a different method, such as `method='median'`.
 3. If using `remotes::install_github()`, you may need to run `install.packages('ps')` and restart R.
 
 We are also actively developing:

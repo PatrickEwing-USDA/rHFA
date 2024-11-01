@@ -23,7 +23,7 @@ Of course, message with questions. If you have ideas for enhancements, please su
 ### Publications:
 
 -   Ewing, P. M., Runck, B. C., Kono, T. Y., & Kantar, M. B. (2019). The home field advantage of modern plant breeding. *PloS one 14*(12), e0227079. [Link](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0227079)
--   MacQueen, Alice H., et al. (2022). "Local to continental‐scale variation in fitness and heritability in common bean." *Crop Science 62*(2): 767-779. [Link](https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.20694) [Code](https://github.com/Alice-MacQueen/cdbn-home-away)
+-   MacQueen, Alice H., et al. (2022). Local to continental‐scale variation in fitness and heritability in common bean. *Crop Science 62*(2): 767-779. [Link](https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.20694) [Code](https://github.com/Alice-MacQueen/cdbn-home-away)
 -   Ewing, P. M., et al. (2024). Local adaptation and broad performance are synergistic to productivity in modern barley. *Crop Science, 64*(1), 192-199. [Link](https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.21168) [Code](https://doi.org/10.5281/zenodo.10267964)
 
 *Disclaimer: Mention of trade names or commercial products in this publication is solely for the purpose of providing specific information and does not imply recommendation or endorsement by the U.S. Department of Agriculture. The USDA is an equal opportunity provider and employer.*

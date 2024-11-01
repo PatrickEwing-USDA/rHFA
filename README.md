@@ -18,8 +18,6 @@ The rHFA Guide vignette contains a step-by-step analysis of sample data. When in
 
 See analysis code for publications below and methods described in those publications - especially Ewing *et al*. (2019).
 
-Of course, message with questions. If you have ideas for enhancements, please suggest/contribute!
-
 ### Publications:
 
 -   Ewing, P. M., Runck, B. C., Kono, T. Y., & Kantar, M. B. (2019). The home field advantage of modern plant breeding. *PloS one 14*(12), e0227079. [Link](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0227079)
@@ -27,3 +25,18 @@ Of course, message with questions. If you have ideas for enhancements, please su
 -   Ewing, P. M., et al. (2024). Local adaptation and broad performance are synergistic to productivity in modern barley. *Crop Science, 64*(1), 192-199. [Link](https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.21168) [Code](https://doi.org/10.5281/zenodo.10267964)
 
 *Disclaimer: Mention of trade names or commercial products in this publication is solely for the purpose of providing specific information and does not imply recommendation or endorsement by the U.S. Department of Agriculture. The USDA is an equal opportunity provider and employer.*
+
+## Issues and Development ##
+rHFA is still under development! The following are known issues:
+
+1. Parallel processing is disabled for windows currently.
+2. When `method="blup"`, permutation testing may stop on error or the significance test may produce an NA. These are related issues. Either increase min_times in `*filter_instances()` or try a different method, such as `method='median'`.
+3. If using `remotes::install_github()`, you may need to run `install.packages('ps')` and restart R.
+
+We are also actively developing:
+
+1. Friendly `print()` and `plot()` methods. For now, call `permute_object$home_field`.
+2. Flexibility for including covariates, including distances.
+3. Methods to calculate additional breeding metrics.
+
+Find another bug? Have ideas for enhancements? General questions? Raise an [issue](https://github.com/PatrickEwing-USDA/rHFA/issues). 

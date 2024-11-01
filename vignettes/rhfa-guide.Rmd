@@ -42,9 +42,9 @@ populations, the preferences of the breeder. We also can evaluate how
 this adaptation has changed across time among populations. Finally, we
 can use it to identify specialist and generalist genotypes. When
 combined with, for example, kinship, heritability ([MacQueen *et al*.,
-2021](https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.20694])
+2021](https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.20694]))
 or genetic potential ([Ewing *et al*.,
-2024](https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.21168),
+2024](https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.21168)),
 HFA allows novel insights into population structure and breeding
 strategy.
 

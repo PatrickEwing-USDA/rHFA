@@ -375,7 +375,7 @@ Home site explains
 P-values here are from the package, `car`, based on the indicated *F*
 test. `get_ss()` is just a wrapper for `car::Anova()`.
 
-## Step 3: ID home site
+## Step 5: ID home site
 
 To quickly match home site with a hybrid, use `get_home_site()`:
 

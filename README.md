@@ -16,6 +16,10 @@ The rHFA Guide vignette contains a step-by-step analysis of sample data. When in
 
 `> remotes::install_github("PatrickEwing-USDA/rHFA", build_vignettes = TRUE)`
 
+Then:
+
+`> vignette('rhfa-guide', package='rHFA')`
+
 See analysis code for publications below and methods described in those publications - especially Ewing *et al*. (2019).
 
 ### Publications:

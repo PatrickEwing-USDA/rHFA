@@ -1,12 +1,12 @@
 ---
 title: "rHFA Guide"
 author:
-   - name: "Eric Killian"
-     role: ["aut"]
-     date: "2022-09-12"
    - name: "Patrick Ewing"
      role: ["aut", "cre"]
      date: "2024-10-11"
+   - name: "Eric Killian"
+     role: ["aut"]
+     date: "2022-09-12"
    - name: "Michael Kantar"
      role: ["aut"]
      date: "2024-10-18"
@@ -63,10 +63,10 @@ for variety *i*; its coefficient is the home field advantage (HFA)
 across genotypes within the population. This metric quantifies the
 benefits of environmental specialization using “home field advantage”
 (HFA), which was defined as the fitness gain an organism has in its
-native soil ((Blanquart *et al*.,
-2013)[<https://doi.org/10.1111/ele.12150>]). Modern crop populations
-lack an obvious home location, so (Ewing *et al*.
-(2019))[<https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0227079>]
+native soil ([Blanquart *et al*.,
+2013](https://doi.org/10.1111/ele.12150)). Modern crop populations
+lack an obvious home location, so [Ewing *et al*.
+(2019)](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0227079)
 redefined HFA as the yield advantage that a crop variety receives at its
 best performing, “home” location, where “best” is relative to other
 varieties, regardless of the location of the breeding program. This
@@ -224,7 +224,7 @@ corn <- filter_instances(
   na.rm=TRUE          # ignore missing data instances
 )
 
-count_instances(corn, 'HYBRID', 'YEAR', TRUE) |>
+count_instances(corn, 'HYBRID', 'YEAR') |>
   summary()
 ```
 
@@ -242,8 +242,7 @@ corn <- filter_instances(
   na.rm=TRUE
 )
 
-count_instances(corn, 'SITE', 'YEAR', na.rm=TRUE) |>
-  summary()
+count_instances(corn, 'SITE', 'YEAR')
 ```
 
 Leaving `r length(unique(corn$SITE))` sites, down from
@@ -311,7 +310,9 @@ pophfa <- permute_hfa(corn,
 ```
 
 For speed reasons, we'll limit ourselves to 9 permutations (plus the
-observed data). In practice, use *at least* 99, preferably 999.
+observed data). In practice, use *at least* 99, preferably 999. If you use
+`method="blup"`, you may hit some errors. Try increasing `min_times` in
+`autofilter_instances()` or using a different `method`.
 
 Now, look at results. `permute_hfa()` returns a list with three objects:
 
@@ -361,7 +362,7 @@ Three new columns are here for your inspection:
 You might wonder how important this HFA is relative to other factors,
 say, location or genotype. The `get_ss()` function will do this.
 
-```{r}
+```{r message=FALSE}
 mod <- lm(pophfa$formula, 
          data=pophfa$data)
 ss <- get_ss(mod)
@@ -370,7 +371,8 @@ ss
 
 Home site explains
 
-`r round(ss['is_home', 'Percent Var'], 2)`% of total variance. Not much.
+`r round(ss['is_home', 'Percent Var'], 3)`% of total variance. This may not seem
+like much, but it is `r round(ss['is_home', 'Sum Sq']/sum(ss[c('is_home', 'Residuals'), 'Sum Sq']), 3)*100`% of otherwise-unexplained GxE (residuals + is_home). 
 
 P-values here are from the package, `car`, based on the indicated *F*
 test. `get_ss()` is just a wrapper for `car::Anova()`.
@@ -485,6 +487,8 @@ p_specialist and p_generalist are the *p* values, i.e. that the null
 hypothesis (specialist/generalist due to chance) is true.
 
 ## Spatial variation in HFA
+To identify the average HFA conferred at each site (for home genotypes), set 
+`level="site"`. 
 
 ```{r}
 sitehfa <- permute_hfa(corn,
@@ -500,11 +504,15 @@ sitehfa <- permute_hfa(corn,
 ```
 
 ```{r}
-sitehfa$home_field
+sitehfa |>
+  specialist_test() |>
+  generalist_test() |>
+  _$home_field
 ```
 
 These are the advantages conferred to home lines at each site. Again,
-results suggest generalist populations. Still:
+results suggest generalist populations. Running `specialist_test()` and `
+`generalist_test()` on this provide some nuance:
 
 -   Mt. Morris may be an environmentally distinct location, as HFA is
     higher than expected.

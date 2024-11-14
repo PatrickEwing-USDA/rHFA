@@ -7,6 +7,7 @@
 #' @param year character, column name indicating temporal units
 #' @param geno character, column name indicating genetic units
 #' @param pheno character, column name indicating the phenotype (ex. yield)
+#' @param popn character, column name indicating subpopulation, defaults to 'NA'. 
 #' @param method character, method of finding highest relative performing location. Defaults to 'blup'. See details.
 #' @param verbose logical (TRUE). Print messages?
 #' @param ... other arguments passed to `method`.
@@ -31,7 +32,7 @@
 #'
 #' @export
 
-id_home <- function(data, site, year, geno, pheno, method = c('blup', 'mean', 'median'), verbose = FALSE, ...) {
+id_home <- function(data, site, year, geno, pheno, popn = NA, method = c('blup', 'mean', 'median'), verbose = FALSE, ...) {
   
   rel_colname <- paste0('rel_', pheno)
   
@@ -42,9 +43,12 @@ id_home <- function(data, site, year, geno, pheno, method = c('blup', 'mean', 'm
   rn <- rownames(data)
   data$rn <- rn
   
-  # Center and scale performance within site-year
-  site_year <- paste(data[, site], data[, year], sep = '_')
-  
+  if (is.na(popn)) {
+    data <- list(data)
+  } else {
+    data <- split(data, data[, popn])
+  }
+
   .scale_pheno <- function(x, pheno) {
     # Create the relative phenotype column
     colname <- paste0('rel_', pheno)
@@ -52,18 +56,25 @@ id_home <- function(data, site, year, geno, pheno, method = c('blup', 'mean', 'm
     return(x)
   }
   
-  # Apply scaling to each site-year group
-  data_split <- split(data, site_year)
-  data_list <- lapply(data_split, .scale_pheno, pheno)
-  data <- do.call(rbind, data_list)
+  data <- lapply(data, function(x) {
+    # Center and scale performance within site-year
+    site_year <- paste(x[, site], x[, year], sep = '_')
   
-  # Find highest relative yield for each genotype using method
-  data <- id_top_pheno(data, site, geno, rel_colname, method, verbose, ...)
+    # Apply scaling to each site-year group
+    x_split <- split(x, site_year)
+    x_list <- lapply(x_split, .scale_pheno, pheno)
+    x <- do.call(rbind, x_list)
+    
+    # Find highest relative yield for each genotype using method
+    x <- id_top_pheno(x, site, geno, rel_colname, method, verbose, ...)
+    
+  }) |>
+    do.call(rbind, args=_)
   
   # Restore original rownames and order
   rownames(data) <- data$rn
-  data$rn <- NULL
   data <- data[rn, ]
+  data$rn <- NULL
   
   return(data)
 }

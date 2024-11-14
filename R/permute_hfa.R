@@ -125,6 +125,7 @@
 #' @param geno column name containing genotype or variety information
 #' @param pheno column name containing phenotype or performance information
 #' @param popn column name differentiating sub-populations of genotypes within the data set.
+#' @param covars formula or character. Specify covariates for the HFA analysis. See **Details**.
 #' @param times how many times do you want to permute (in addition to observed data)?
 #' @param method *character* for estimating relative performance at each location. Default is
 #' 'blup'. Other arguments that name functions (ex. `median`, `mean`, `quantile`) can be used.
@@ -139,9 +140,19 @@
 #'
 #' Note that observed HFA may differ slightly from "manual" calculations (ex. via `lm()`)
 #' as it uses sparse matrix operations for efficiency. See `Matrix::qr()` and `Matrix::qrR()`.
+#' 
+#' You can specify covariates to the HFA analysis - for example, environmental parameters if they are
+#' included as columns in `data`. You must specify exactly how you want the covariates included - including
+#' interactions with core HFA terms - using formula notation. For example, specifying `covars=~temperature + precipitation:is_home`
+#' will allow preciptation, but not temperature, to interact with the home site designator. An equivalent
+#' would be `covars="temperature + precipitation:is_home"`. You should probably check the formula output (`out$formula`).
 #'
-#' @return A list with two items: `'home_field'` is a `data.frame` that
-#' summarizes the results. `perms` is a matrix (or list of matrices) of permutations.
+#' @return A list with four items: 
+#' 
+#' - `out$home_field` is a `data.frame` that summarizes the results. 
+#' - `out$data` is a `data.frame` of the data used when calculating HFA. 
+#' - `out$perms` is a matrix (or list of matrices) of permutation results
+#' - `out$formula` is the formula used for calculating HFA
 #'
 #' @seealso `id_home()`
 #' @importFrom parallel detectCores mclapply makeCluster parLapply stopCluster clusterExport
@@ -156,6 +167,7 @@ permute_hfa <- function(data,
                         geno = NA,
                         pheno = NA,
                         popn = NA,
+                        covars = NA,
                         times = 99,
                         method = 'blup',
                         parallel = TRUE,
@@ -175,7 +187,6 @@ permute_hfa <- function(data,
       ncpu <- detectCores()
     }
   }
-# ------------------------------------------------------------------------------
 
   # new column names
   rel_pheno <- paste0('rel_', pheno)
@@ -183,12 +194,25 @@ permute_hfa <- function(data,
   # formula for calculating HFA effect
   ff <- switch(level,
                'population' = ' ~ site*year + geno + is_home',  # overall HFA
-               'genotype' = ' ~ site*year + geno + geno:is_home',  # hfa for each genotype
+               'genotype' = ' ~ site*year + geno + geno:is_home',  # HFA for each genotype
                'year' = '~ site*year + geno + year:is_home',  # HFA for each year 
                'site' = '~ year*site + geno + site:is_home')  # HFA for each site
   
-  ff <- formula(gsub('geno', geno, gsub('year', year, gsub('site', site, ff))))
+  # ----TODO finish incorporating covariates ----- #
+  if (!is.na(covars)) {
+    if (is.character(covars)) {
+      covars <- gsub('~', '', covars)
+    else {
+      covars <- as.character(covars)[2]
+    }
+    ff <- paste(ff, covars, sep='+')
+  }
   
+  ff <- gsub('geno', geno, ff) |>
+    gsub('site', site, x=_) |>
+    gsub('year', year, x=_) |>
+    formula()
+    
   # select and format data into list of dataframes for each population
   #   adjusting the column selection inside permute_hfa
   dd <- if (is.na(popn)) {

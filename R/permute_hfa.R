@@ -163,17 +163,12 @@ permute_hfa <- function(data,
                         ...) {
   
   level <- match.arg(level)
-#  ncpu <- ifelse(parallel, detectCores(), 1) 
   
-# ------------------------------------------------------------------------------
   is_windows <- grepl('mingw', version$os)
   
   # Set up parallel processing based on OS
   if (parallel) {
     if (is_windows) {
-      message("Parallel processing isn't quite implemented for Windows. Running in series.")
-      parallel <- FALSE
-      
       cl <- makeCluster(detectCores())
       clusterExport(cl, varlist = ls(), envir = environment())
     } else {
@@ -209,15 +204,14 @@ permute_hfa <- function(data,
   }
   
   # Calculate relative yields
-  # ------ TODO: add ellipses and pass them to parLapply for passing objects to fork environments.
-  calculate_hfa <- function(x) {
+  calculate_hfa <- function(x, ...) {
     x <- id_home(x, site, year, geno, pheno, method, verbose = FALSE, ...)
     return(x)
   }
   
   if (parallel) {
     if (is_windows) {
-      dd <- parLapply(cl, dd, calculate_hfa)
+      dd <- parLapply(cl, dd, calculate_hfa, ...)
     } else {
       dd <- mclapply(dd, calculate_hfa, mc.cores = ncpu)
     }
@@ -226,30 +220,45 @@ permute_hfa <- function(data,
   }
 
   # Permute HFA within each population
-  # ----- TODO: move parallelization to after generate_sets, not at population level.
-  perform_permutations <- function(x) {
-    sets <- .generate_sets(x, site, year, times, seed)
-    coef_permute <- do.call(cbind, lapply(sets, function(ss) {
-      x[, c(pheno, rel_pheno)] <- x[ss, c(pheno, rel_pheno)]
-      x <- id_top_pheno(x, site = site, geno = geno, pheno = rel_pheno, method = method, verbose = FALSE, ...)
-      home_coef <- .calculate_hfa(x, ff, pheno, geno, site, year)
-      return(home_coef)
-    }))
-    colnames(coef_permute) <- c('observed', paste0('perm', 1:(ncol(coef_permute) - 1)))
-    test <- cbind(intervals = calculate_intervals(coef_permute), p_val = .two_tailed(coef_permute))
-    return(list(results = test, perms = coef_permute))
+  .perform_permutations <- function(ss, x, ...) {
+    x[, c(pheno, rel_pheno)] <- x[ss, c(pheno, rel_pheno)]
+    x <- id_top_pheno(x, site = site, geno = geno, pheno = rel_pheno, method = method, verbose = FALSE, ...)
+    home_coef <- .calculate_hfa(x, ff, pheno, geno, site, year)
+    return(home_coef)
   }
   
-  if (parallel) {
-    if (is_windows) {
-      results <- parLapply(cl, dd, perform_permutations)
-      stopCluster(cl)
+  .poplevel_results <- function(x, ...) {
+    sets = .generate_sets(x, site, year, times, seed)
+    
+    # perform permutations
+    if (parallel) {
+      if (is_windows) {
+        coef_permute = parLapply(cl, sets, .perform_permutations, x, ...)
+        stopCluster(cl)
+      } else {
+        coef_permute <- mclapply(sets, .perform_permutations, x, ...mc.cores=ncpu)
+      }
     } else {
-      results <- mclapply(dd, perform_permutations, mc.cores = ncpu)
+      coef_permute <- lapply(sets, .perform_permutations, x, ...)
     }
-  } else {
-    results <- lapply(dd, perform_permutations)
+    coef_permute <- do.call(cbind, coef_permute)
+    colnames(coef_permute) <- c('observed', 
+                               paste0('perm', 
+                                      1:(ncol(coef_permute)-1)))
+    
+    # run test
+    test <- cbind(
+      intervals = calculate_intervals(coef_permute),
+      p_val = .two_tailed(coef_permute)
+    )
+      
+    results <- list(results = test,
+                   perms = coef_permute)
+      
+    return(results)
+    
   }
+  results <- lapply(dd, .poplevel_results, ...) 
 
   # format results
   if (is.null(names(results))) {

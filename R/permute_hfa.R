@@ -229,7 +229,7 @@ permute_hfa <- function(data,
   
   # Calculate relative yields
   calculate_hfa <- function(x, ...) {
-    x <- id_home(x, site, year, geno, pheno, method, verbose = FALSE, ...)
+    x <- id_home(x, site, year, geno, pheno, method = method, verbose = FALSE, ...)
     return(x)
   }
   

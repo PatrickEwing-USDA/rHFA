@@ -202,7 +202,7 @@ permute_hfa <- function(data,
   if (!is.na(covars)) {
     if (is.character(covars)) {
       covars <- gsub('~', '', covars)
-    else {
+    } else {
       covars <- as.character(covars)[2]
     }
     ff <- paste(ff, covars, sep='+')

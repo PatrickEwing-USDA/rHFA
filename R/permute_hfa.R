@@ -198,28 +198,32 @@ permute_hfa <- function(data,
                'year' = '~ site*year + geno + year:is_home',  # HFA for each year 
                'site' = '~ year*site + geno + site:is_home')  # HFA for each site
   
-  # ----TODO finish incorporating covariates ----- #
-  if (!is.na(covars)) {
-    if (is.character(covars)) {
-      covars <- gsub('~', '', covars)
-    } else {
-      covars <- as.character(covars)[2]
-    }
+  # ----TODO allow covariates to interact with is_home. See dimnames error line 298 ----- #
+  if (is.character(covars)) {
+    covars <- gsub('~', '', covars)
     ff <- paste(ff, covars, sep='+')
-  }
+  } else if (class(covars) == 'formula') {
+    covars <- as.character(covars)
+    covars <- covars[length(covars)]
+    ff <- paste(ff, covars, sep='+')
+  } else if (!is.na(covars)) {
+    stop('`covars` must be a character or formula')
+  } 
   
-  ff <- gsub('geno', geno, ff) |>
+  ff <- 
+    gsub('geno', geno, ff) |>
     gsub('site', site, x=_) |>
     gsub('year', year, x=_) |>
     formula()
+  
+
     
   # select and format data into list of dataframes for each population
-  #   adjusting the column selection inside permute_hfa
-  dd <- if (is.na(popn)) {
-    na.omit(data[, c(site, year, geno, pheno)])
-  } else {
-    na.omit(data[, c(site, year, geno, pheno, popn)])
-  }
+  data$is_home='test'   # placeholder
+  add_cols = na.omit(c(pheno, popn))
+  dd = cbind(data[, add_cols, drop=FALSE],
+             model.frame(ff, data=data))
+  # return(dd)
   
   if (is.na(popn)) {
     dd <- list(dd)

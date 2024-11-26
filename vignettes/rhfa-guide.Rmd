@@ -114,7 +114,7 @@ must be in long format containing the plant variety and data from
 multiple years at each location.
 
 ```{r}
-library(rHFA)
+# library(rHFA)
 
 in_corn <- system.file('extdata', 'illinois_corn_yield.csv', package = "rHFA")
 corn <- read.csv(in_corn)
@@ -307,7 +307,7 @@ pophfa <- permute_hfa(corn,
                      year='YEAR',
                      geno='HYBRID',
                      pheno='YIELD',
-                     population=NA, # specify to run separately for each sub-population.
+                     popn=NA, # specify to run separately for each sub-population.
                      times=9, 
                      method='blup',
                      parallel=TRUE, 
@@ -319,14 +319,14 @@ observed data). In practice, use *at least* 99, preferably 999. If you use
 `method="blup"`, you may hit some errors. Try increasing `min_times` in
 `autofilter_instances()` or using a different `method`.
 
-Now, look at results. `permute_hfa()` returns a list with three objects:
+Now, look at results. `permute_hfa()` returns a list with four objects:
 
 1.  `.$home_field`, which contains HFA effects and the results of a
     permutation test.
-2.  `.$perms`, which contains the permutations
-3.  `.$formula`, the formula used to calculate HFA.
-
-
+2.  `.$data`, containing the subset of data (including calculated internally)
+    for the analysis
+3.  `.$perms`, which contains the permutations
+4.  `.$formula`, the formula used to calculate HFA.
 
 ```{r}
 pophfa$home_field
@@ -580,6 +580,49 @@ HFA has not changed across years.
 
 # Extensions {style="color: lightgray"}
 
+## Generic covariates
+Suppose you think a covariate like kinship affects the strength of HFA. rHFA will allow
+you to specify them in the 'covars' section. We will demonstrate with a random
+variable. 
+
+```{r}
+set.seed(323)
+corn$COVAR = rnorm(nrow(corn))
+```
+
+Just include this as the `covars` argument to permuate_hfa. You can use
+either characters specifying column names or a formula (handy for multiple
+covariates). This uses the formula specification option. 
+```{r}
+covarhfa = permute_hfa(corn, 
+                 'population', 
+                 site='SITE',
+                 year='YEAR',
+                 geno='HYBRID',
+                 pheno='YIELD',
+                 covars=~COVAR,
+                 times=9, 
+                 method='blup',
+                 parallel=TRUE, 
+                 seed=73956)
+covarhfa$formula
+```
+The covariate slightly alters estimates of home field advantage:
+
+```{r}
+list(covar = covarhfa$home_field,
+      orig = pophfa$home_field)
+```
+
+Of course it isn't significant because it's just a random variable. 
+```{r}
+mod <- lm(covarhfa$formula, 
+          data=covarhfa$data)
+ss <- get_ss(mod)
+ss
+```
+
+
 ## Distances among home sites {style="color: lightgray"}
 
 Two functions measure the distance between home sites of genotype pairs.
@@ -601,7 +644,7 @@ If you get errors, check that:
 # 
 # names(corn_sites) = gsub('City', 'SITE', names(corn_sites))
 # corn_sites[, 'SITE'] = tolower(corn_sites[, 'SITE'])
-
+# 
 # home_dist = home_distance_spatial(
 #   data=corn,
 #   locations=corn_sites,

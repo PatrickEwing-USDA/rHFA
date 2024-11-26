@@ -326,6 +326,8 @@ Now, look at results. `permute_hfa()` returns a list with three objects:
 2.  `.$perms`, which contains the permutations
 3.  `.$formula`, the formula used to calculate HFA.
 
+
+
 ```{r}
 pophfa$home_field
 ```

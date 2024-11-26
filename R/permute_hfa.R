@@ -213,10 +213,10 @@ permute_hfa <- function(data,
     if (is_windows) {
       dd <- parLapply(cl, dd, calculate_hfa, ...)
     } else {
-      dd <- mclapply(dd, calculate_hfa, mc.cores = ncpu)
+      dd <- mclapply(dd, calculate_hfa, ..., mc.cores = ncpu)
     }
   } else {
-    dd <- lapply(dd, calculate_hfa)
+    dd <- lapply(dd, calculate_hfa, ...)
   }
 
   # Permute HFA within each population

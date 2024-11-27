@@ -43,7 +43,7 @@ permute_hfa(
 \item{method}{*character* for estimating relative performance at each location. Default is
 'blup'. Other arguments that name functions (ex. `median`, `mean`, `quantile`) can be used.}
 
-\item{parallel}{*logical* use parallel processing? Currently only on UNIX.}
+\item{parallel}{*logical* use parallel processing?}
 
 \item{seed}{*numeric* for reproducible permutations}
 
@@ -58,7 +58,7 @@ A list with four items:
 - `out$formula` is the formula used for calculating HFA
 }
 \description{
-test the magnitude and significance of the home field advantage
+Test the magnitude and significance of the home field advantage
 versus what would be expected by chance.
 }
 \details{

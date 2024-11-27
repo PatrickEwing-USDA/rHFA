@@ -114,9 +114,7 @@ must be in long format containing the plant variety and data from
 multiple years at each location.
 
 ```{r}
-# library(rHFA)
-rl = function() devtools::load_all()
-rl()
+library(rHFA)
 
 in_corn <- system.file('extdata', 'illinois_corn_yield.csv', package = "rHFA")
 corn <- read.csv(in_corn)
@@ -335,7 +333,7 @@ pophfa$home_field
 ```
 
 For the entire population, the observed HFA was 12.1 bushels per acre, a
-`r round(pophfa$home_field[1, 1]/mean(corn$YIELD), 3)*100`% increase
+`r round(pophfa$home_field[1, 'HFA']/mean(corn$YIELD), 3)*100`% increase
 over the average corn yield in this dataset. However, this was about 1.3
 bushels per acre less than expected (90% confidence interval: -2.2 to
 -0.2 bushels per acre). Every permutation's HFA was larger than the
@@ -555,13 +553,13 @@ We don't see an obvious trend here, but plotting may help:
 ```{r}
 yhfa <- yearhfa$home_field
 plot(as.numeric(yhfa$YEAR), 
-     yhfa$observed,
+     yhfa$HFA,
      xlab='Year',
      ylab='HFA')
 points(as.numeric(yhfa$YEAR),
-       yhfa$observed - yhfa$diff_q50, col='red')
+       yhfa$expected, col='red')
 legend('topright',
-       c('expected', 'observed'),
+       c('observed', 'expected'),
        col=c('black', 'red'),
        pch=1)
 ```
@@ -570,7 +568,7 @@ No obvious trend - if anything, it may be slighlty down. Of course we
 can test this:
 
 ```{r}
-lm(observed ~ as.numeric(YEAR), 
+lm(HFA ~ as.numeric(YEAR), 
    data=yearhfa$home_field) |>
    summary()
 ```

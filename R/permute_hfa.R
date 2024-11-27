@@ -114,7 +114,7 @@
 
 #' @title permute_hfa
 #'
-#' @description test the magnitude and significance of the home field advantage
+#' @description Test the magnitude and significance of the home field advantage
 #' versus what would be expected by chance.
 #'
 #' @param data data.frame
@@ -129,7 +129,7 @@
 #' @param times how many times do you want to permute (in addition to observed data)?
 #' @param method *character* for estimating relative performance at each location. Default is
 #' 'blup'. Other arguments that name functions (ex. `median`, `mean`, `quantile`) can be used.
-#' @param parallel *logical* use parallel processing? Currently only on UNIX.
+#' @param parallel *logical* use parallel processing?
 #' @param seed *numeric* for reproducible permutations
 #' @param ... added arguments passed to `method`.
 #'
@@ -276,8 +276,8 @@ permute_hfa <- function(data,
     
     # run test
     test <- cbind(
-      calculate_intervals(coef_permute),
-      .two_tailed(coef_permute)
+      intervals = calculate_intervals(coef_permute),
+      p_val = .two_tailed(coef_permute)
     )
       
     results <- list(results = test,
@@ -340,5 +340,6 @@ permute_hfa <- function(data,
   out <- list(home_field = test_results, data = do.call(rbind, dd), perms = perms, formula = ff)
   attr(out, 'Print_Warning') <- "A print method is on its way. For now, you probably want to call obj$home_field."
   
+  class(out) = c('rHFA', 'list')
   return(out)
 }

@@ -16,7 +16,8 @@ calculate_intervals <- function(x) {
   
   # Calculate the observed value, median, 5th percentile, and 95th percentile
   out <- cbind(
-    observed = x[, 1, drop = FALSE],
+    HFA = x[, 1, drop=TRUE],
+    expected = apply(x, 1, median, na.rm=TRUE),
     diff_q50 = apply(difference, 1, median, na.rm = TRUE),
     diff_q05 = apply(difference, 1, quantile, 0.05, na.rm = TRUE),
     diff_q95 = apply(difference, 1, quantile, 0.95, na.rm = TRUE)

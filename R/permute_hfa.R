@@ -103,7 +103,7 @@
   home_coef <- home_coef[is_home]
   
   # Format the coefficient names for better readability
-  names(home_coef) <- gsub(':is_homeTRUE', '', names(home_coef))
+  # names(home_coef) <- gsub(':is_homeTRUE', '', names(home_coef))
   names(home_coef) <- gsub(geno, '', names(home_coef))
   names(home_coef) <- gsub(year, '', names(home_coef))
   names(home_coef) <- gsub(site, '', names(home_coef))
@@ -276,8 +276,8 @@ permute_hfa <- function(data,
     
     # run test
     test <- cbind(
-      intervals = calculate_intervals(coef_permute),
-      p_val = .two_tailed(coef_permute)
+      calculate_intervals(coef_permute),
+      .two_tailed(coef_permute)
     )
       
     results <- list(results = test,
@@ -292,19 +292,45 @@ permute_hfa <- function(data,
   if (is.null(names(results))) {
     names(results) <- paste0('popn', seq_len(length(results)))
   }
-  
+
   if (level == 'population') {
-    test_results <- do.call(rbind, lapply(results, function(x) x$results))
-    rownames(test_results) <- names(results)
-    perms <- do.call(rbind, lapply(results, function(x) x$perms))
-    rownames(perms) <- names(results)
-  } else {
-    lvl <- switch(level, 'genotype' = geno, 'year' = year, 'site' = site)
-    test_results <- do.call(rbind, lapply(names(results), function(x) {
-      res <- data.frame(popn = x, lvl = rownames(results[[x]]$results), results[[x]]$results, stringsAsFactors = FALSE)
-      colnames(res) <- gsub('lvl', lvl, colnames(res))
+    # format test_results
+    test_results <- lapply(names(results), function(x) {
+      res <- data.frame(population = x,
+                        value = "temp",
+                        results[[x]]$results)
+      res$value <- rownames(res)
+      rownames(res) <- NULL
       return(res)
-    }))
+    })
+    test_results <- do.call(rbind, test_results)
+    
+    # format permutations
+    perms <- lapply(names(results), function(x) {
+      per <- results[[x]]$perms
+      rownames(per) <- gsub('is_home', x, rownames(per))
+      return(per)
+    })
+    perms <- do.call(rbind, perms)
+    
+  } else {
+    test_results <- lapply(names(results), function(x) {
+      res <- data.frame(population = x, 
+                        lvl = rownames(results[[x]]$results), 
+                        results[[x]]$results, 
+                        stringsAsFactors = FALSE)
+      
+      # a little more formatting for readability (continuing from .calculate_hfa())
+      res$lvl <- gsub(':is_home', '', res$lvl)  
+      rownames(res) <- res$lvl
+      lvl_rename <- switch(level, 
+                           'genotype' = geno, 
+                           'year' = year, 
+                           'site' = site)
+      colnames(res) <- gsub('lvl', lvl_rename, colnames(res))
+      return(res)
+    })
+    test_results <- do.call(rbind, test_results)
     perms <- lapply(results, function(x) x$perms)
   }
   

@@ -42,7 +42,7 @@ populations, the preferences of the breeder. We also can evaluate how
 this adaptation has changed across time among populations. Finally, we
 can use it to identify specialist and generalist genotypes. When
 combined with, for example, kinship, heritability ([MacQueen *et al*.,
-2021](https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.20694]))
+2021](https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.20694%5D))
 or genetic potential ([Ewing *et al*.,
 2024](https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.21168)),
 HFA allows novel insights into population structure and breeding
@@ -64,8 +64,8 @@ across genotypes within the population. This metric quantifies the
 benefits of environmental specialization using “home field advantage”
 (HFA), which was defined as the fitness gain an organism has in its
 native soil ([Blanquart *et al*.,
-2013](https://doi.org/10.1111/ele.12150)). Modern crop populations
-lack an obvious home location, so [Ewing *et al*.
+2013](https://doi.org/10.1111/ele.12150)). Modern crop populations lack
+an obvious home location, so [Ewing *et al*.
 (2019)](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0227079)
 redefined HFA as the yield advantage that a crop variety receives at its
 best performing, “home” location, where “best” is relative to other
@@ -115,6 +115,8 @@ multiple years at each location.
 
 ```{r}
 # library(rHFA)
+rl = function() devtools::load_all()
+rl()
 
 in_corn <- system.file('extdata', 'illinois_corn_yield.csv', package = "rHFA")
 corn <- read.csv(in_corn)
@@ -315,16 +317,16 @@ pophfa <- permute_hfa(corn,
 ```
 
 For speed reasons, we'll limit ourselves to 9 permutations (plus the
-observed data). In practice, use *at least* 99, preferably 999. If you use
-`method="blup"`, you may hit some errors. Try increasing `min_times` in
-`autofilter_instances()` or using a different `method`.
+observed data). In practice, use *at least* 99, preferably 999. If you
+use `method="blup"`, you may hit some errors. Try increasing `min_times`
+in `autofilter_instances()` or using a different `method`.
 
 Now, look at results. `permute_hfa()` returns a list with four objects:
 
 1.  `.$home_field`, which contains HFA effects and the results of a
     permutation test.
-2.  `.$data`, containing the subset of data (including calculated internally)
-    for the analysis
+2.  `.$data`, containing the subset of data (including calculated
+    internally) for the analysis
 3.  `.$perms`, which contains the permutations
 4.  `.$formula`, the formula used to calculate HFA.
 
@@ -378,8 +380,10 @@ ss
 
 Home site explains
 
-`r round(ss['is_home', 'Percent Var'], 3)`% of total variance. This may not seem
-like much, but it is `r round(ss['is_home', 'Sum Sq']/sum(ss[c('is_home', 'Residuals'), 'Sum Sq']), 3)*100`% of otherwise-unexplained GxE (residuals + is_home). 
+`r round(ss['is_home', 'Percent Var'], 3)`% of total variance. This may
+not seem like much, but it is
+`r round(ss['is_home', 'Sum Sq']/sum(ss[c('is_home', 'Residuals'), 'Sum Sq']), 3)*100`%
+of otherwise-unexplained GxE (residuals + is_home).
 
 P-values here are from the package, `car`, based on the indicated *F*
 test. `get_ss()` is just a wrapper for `car::Anova()`.
@@ -494,8 +498,9 @@ p_specialist and p_generalist are the *p* values, i.e. that the null
 hypothesis (specialist/generalist due to chance) is true.
 
 ## Spatial variation in HFA
-To identify the average HFA conferred at each site (for home genotypes), set 
-`level="site"`. 
+
+To identify the average HFA conferred at each site (for home genotypes),
+set `level="site"`.
 
 ```{r}
 sitehfa <- permute_hfa(corn,
@@ -518,8 +523,8 @@ sitehfa |>
 ```
 
 These are the advantages conferred to home lines at each site. Again,
-results suggest generalist populations. Running `specialist_test()` and `
-`generalist_test()` on this provide some nuance:
+results suggest generalist populations. Running `specialist_test()` and
+generalist_test()\` on this provide some nuance:
 
 -   Mt. Morris may be an environmentally distinct location, as HFA is
     higher than expected.
@@ -572,18 +577,13 @@ lm(observed ~ as.numeric(YEAR),
 
 HFA has not changed across years.
 
-------------------------------------------------------------------------
-
-# *The following sections are under construction...*
-
-------------------------------------------------------------------------
-
-# Extensions {style="color: lightgray"}
+# Extensions
 
 ## Generic covariates
-Suppose you think a covariate like kinship affects the strength of HFA. rHFA will allow
-you to specify them in the 'covars' section. We will demonstrate with a random
-variable. 
+
+Suppose you think a covariate like kinship affects the strength of HFA.
+rHFA will allow you to specify them in the 'covars' section. We will
+demonstrate with a random variable.
 
 ```{r}
 set.seed(323)
@@ -591,8 +591,9 @@ corn$COVAR = rnorm(nrow(corn))
 ```
 
 Just include this as the `covars` argument to permuate_hfa. You can use
-either characters specifying column names or a formula (handy for multiple
-covariates). This uses the formula specification option. 
+either characters specifying column names or a formula (handy for
+multiple covariates). This uses the formula specification option.
+
 ```{r}
 covarhfa = permute_hfa(corn, 
                  'population', 
@@ -600,13 +601,14 @@ covarhfa = permute_hfa(corn,
                  year='YEAR',
                  geno='HYBRID',
                  pheno='YIELD',
-                 covars=~COVAR,
-                 times=9, 
+                 covars=~COVAR:is_home,
+                 times=2, 
                  method='blup',
-                 parallel=TRUE, 
+                 parallel=FALSE, 
                  seed=73956)
 covarhfa$formula
 ```
+
 The covariate slightly alters estimates of home field advantage:
 
 ```{r}
@@ -614,14 +616,14 @@ list(covar = covarhfa$home_field,
       orig = pophfa$home_field)
 ```
 
-Of course it isn't significant because it's just a random variable. 
+Of course it isn't significant because it's just a random variable.
+
 ```{r}
 mod <- lm(covarhfa$formula, 
           data=covarhfa$data)
 ss <- get_ss(mod)
 ss
 ```
-
 
 ## Distances among home sites {style="color: lightgray"}
 
@@ -636,31 +638,42 @@ If you get errors, check that:
     name as the phenotypic dataframe.
 2.  All sites in the phenotype dataframe should be present in the site
     attributes dataframe.
+3.  Your data has a column flagging `is_home`. Call either `id_home()` or
+    `permute_hfa()$data`.
 
+### Spatial
 ```{r}
 
-# corn_sites = system.file('extdata', 'illinois_sites.csv', package = "rHFA")
-# corn_sites = read.csv(corn_sites)
-# 
-# names(corn_sites) = gsub('City', 'SITE', names(corn_sites))
-# corn_sites[, 'SITE'] = tolower(corn_sites[, 'SITE'])
-# 
-# home_dist = home_distance_spatial(
-#   data=corn,
-#   locations=corn_sites,
-#   geno='HYBRID',
-#   site='SITE',
-#   lat='Lat',
-#   long='Lon'
-# )
-# 
-# home_dist[1:5, 1:5]
+corn_sites = system.file('extdata', 'illinois_sites.csv', package = "rHFA")
+corn_sites = read.csv(corn_sites)
+
+names(corn_sites) = gsub('City', 'SITE', names(corn_sites))
+corn_sites[, 'SITE'] = tolower(corn_sites[, 'SITE'])
+
+home_dist = home_distance_spatial(
+  data=pophfa$data,  # need to identify home sites
+  locations=corn_sites,
+  geno='HYBRID',
+  site='SITE',
+  lat='Lat',
+  long='Lon'
+)
+
+home_dist[1:5, 1:5]
 ```
 
 Note the distances are in kilometers.
 
-The generic
+------------------------------------------------------------------------
 
+# *The following sections are under construction...*
+
+------------------------------------------------------------------------
+
+# More Extensions {style="color: lightgray"}
+
+
+### Environmental
 ```{r}
 # envi_dist = home_distance_environmental(
 #   data=corn,

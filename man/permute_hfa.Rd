@@ -12,6 +12,7 @@ permute_hfa(
   geno = NA,
   pheno = NA,
   popn = NA,
+  covars = NA,
   times = 99,
   method = "blup",
   parallel = TRUE,
@@ -35,6 +36,8 @@ permute_hfa(
 
 \item{popn}{column name differentiating sub-populations of genotypes within the data set.}
 
+\item{covars}{formula or character. Specify covariates for the HFA analysis. See **Details**.}
+
 \item{times}{how many times do you want to permute (in addition to observed data)?}
 
 \item{method}{*character* for estimating relative performance at each location. Default is
@@ -47,8 +50,12 @@ permute_hfa(
 \item{...}{added arguments passed to `method`.}
 }
 \value{
-A list with two items: `'home_field'` is a `data.frame` that
-summarizes the results. `perms` is a matrix (or list of matrices) of permutations.
+A list with four items: 
+
+- `out$home_field` is a `data.frame` that summarizes the results. 
+- `out$data` is a `data.frame` of the data used when calculating HFA. 
+- `out$perms` is a matrix (or list of matrices) of permutation results
+- `out$formula` is the formula used for calculating HFA
 }
 \description{
 test the magnitude and significance of the home field advantage
@@ -62,6 +69,12 @@ between observed and expected (permuted) HFA - and tests whether this difference
 
 Note that observed HFA may differ slightly from "manual" calculations (ex. via `lm()`)
 as it uses sparse matrix operations for efficiency. See `Matrix::qr()` and `Matrix::qrR()`.
+
+You can specify covariates to the HFA analysis - for example, environmental parameters if they are
+included as columns in `data`. You must specify exactly how you want the covariates included - including
+interactions with core HFA terms - using formula notation. For example, specifying `covars=~temperature + precipitation:is_home`
+will allow preciptation, but not temperature, to interact with the home site designator. An equivalent
+would be `covars="temperature + precipitation:is_home"`. You should probably check the formula output (`out$formula`).
 }
 \seealso{
 `id_home()`

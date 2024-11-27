@@ -10,6 +10,7 @@ id_home(
   year,
   geno,
   pheno,
+  popn = NA,
   method = c("blup", "mean", "median"),
   verbose = FALSE,
   ...
@@ -25,6 +26,8 @@ id_home(
 \item{geno}{character, column name indicating genetic units}
 
 \item{pheno}{character, column name indicating the phenotype (ex. yield)}
+
+\item{popn}{character, column name indicating subpopulation, defaults to 'NA'.}
 
 \item{method}{character, method of finding highest relative performing location. Defaults to 'blup'. See details.}
 

@@ -114,7 +114,8 @@ must be in long format containing the plant variety and data from
 multiple years at each location.
 
 ```{r}
-library(rHFA)
+# library(rHFA)
+devtools::load_all()
 
 in_corn <- system.file('extdata', 'illinois_corn_yield.csv', package = "rHFA")
 corn <- read.csv(in_corn)
@@ -319,7 +320,12 @@ observed data). In practice, use *at least* 99, preferably 999. If you
 use `method="blup"`, you may hit some errors. Try increasing `min_times`
 in `autofilter_instances()` or using a different `method`.
 
-Now, look at results. `permute_hfa()` returns a list with four objects:
+Now, look at results. For a quick glance, just `print` it:
+```{r}
+pophfa
+```
+
+`pophfa` acts as a list with four objects:
 
 1.  `.$home_field`, which contains HFA effects and the results of a
     permutation test.
@@ -328,6 +334,7 @@ Now, look at results. `permute_hfa()` returns a list with four objects:
 3.  `.$perms`, which contains the permutations
 4.  `.$formula`, the formula used to calculate HFA.
 
+They're convenient for accessing the useful results:
 ```{r}
 pophfa$home_field
 ```
@@ -545,7 +552,7 @@ yearhfa <- permute_hfa(corn,
 ```
 
 ```{r}
-yearhfa$home_field
+yearhfa
 ```
 
 We don't see an obvious trend here, but plotting may help:
@@ -600,11 +607,11 @@ covarhfa = permute_hfa(corn,
                  geno='HYBRID',
                  pheno='YIELD',
                  covars=~COVAR:is_home,
-                 times=2, 
+                 times=9, 
                  method='blup',
                  parallel=FALSE, 
                  seed=73956)
-covarhfa$formula
+covarhfa
 ```
 
 The covariate slightly alters estimates of home field advantage:

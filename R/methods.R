@@ -15,12 +15,15 @@ print.rHFA <- function(x, ...) {
   is_numeric <- sapply(out, is.numeric)
   out[is_numeric] <- lapply(out[is_numeric], signif, 3)
   
-  nperms <- ncol(x$perms)-1
+  nperms <- ifelse(any(class(x$perms) == 'list'), 
+                   ncol(x$perms[[1]])-1,
+                   ncol(x$perms)-1)
   nperms <- paste('Results of', nperms, 'permutations:')
   
   cat('Formula:\n', ff)
   cat('\n\n\n')
   cat(nperms, '\n\n')
   print(out)
+  cat('\n\n')
   invisible(x)
 }

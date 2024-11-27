@@ -33,14 +33,12 @@ See analysis code for publications below and methods described in those publicat
 ## Issues and Development ##
 rHFA is still under development! The following are known issues:
 
-1. Parallel processing is disabled for windows currently.
-2. When `method="blup"`, permutation testing with `permute_hfa()` may stop on error or the significance test may produce an NA. These are related issues. Either increase `min_times` in `*filter_instances()` or try a different method, such as `method='median'`.
-3. If using `remotes::install_github()`, you may need to run `install.packages('ps')` and restart R.
+1. When `method="blup"`, permutation testing with `permute_hfa()` may stop on error or the significance test may produce an NA. These are related issues. Either increase `min_times` in `*filter_instances()` or try a different method, such as `method='median'`.
+2. If using `remotes::install_github()`, you may need to run `install.packages('ps')` and restart R.
 
 We are also actively developing:
 
-1. Friendly `print()` and `plot()` methods. For now, call `permute_object$home_field`.
-2. Flexibility for including covariates, including distances.
-3. Methods to calculate additional breeding metrics.
+1. Friendly `plot()` methods to easily recreate graphs as in the above-cited publications.
+2. Methods to calculate additional breeding metrics.
 
 Find another bug? Have ideas for enhancements? General questions? Raise an [issue](https://github.com/PatrickEwing-USDA/rHFA/issues). 

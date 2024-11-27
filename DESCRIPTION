@@ -29,3 +29,6 @@ RoxygenNote: 7.3.2
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 Imports: car, nlme, Matrix, parallel, permute, sp
+Depends: 
+    R (>= 2.10)
+LazyData: true

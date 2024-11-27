@@ -111,18 +111,11 @@ modeling approaches, especially for sparser datasets.
 
 Data can be acquired from a number of common garden-like designs. They
 must be in long format containing the plant variety and data from
-multiple years at each location.
+multiple years at each location. Note column data types!
 
 ```{r}
-# library(rHFA)
-devtools::load_all()
-
-in_corn <- system.file('extdata', 'illinois_corn_yield.csv', package = "rHFA")
-corn <- read.csv(in_corn)
-
-# convert columns to factors
-facts <- c('YEAR', 'COMPANY', 'HYBRID', 'SITE')
-corn[facts] <- lapply(corn[facts], as.factor)
+library(rHFA)
+data(corn)
 
 head(corn, 10)
 corn_full <- corn  # to access the original data later

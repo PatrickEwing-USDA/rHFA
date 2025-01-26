@@ -178,6 +178,13 @@ permute_hfa <- function(data,
   
   is_windows <- grepl('mingw', version$os)
   
+  # quick checks)
+  if (!is.factor(data[, year])) {
+    message(paste("Coercing", year, "into a factor."))
+    data[, year] <- as.factor(data[, year])
+  }
+  if (is.null(rownames(data))) rownames(data) <- seq_len(nrow(data))
+  
   # Set up parallel processing based on OS
   if (parallel) {
     if (is_windows) {

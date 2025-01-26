@@ -16,10 +16,7 @@
 #' @importFrom stats na.omit
 #' @export
 
-count_instances <- function(data, group_col, rep_col, na.rm = FALSE) {
-  if (na.rm) {
-    data <- droplevels(na.omit(data))
-  }
+count_instances <- function(data, group_col, rep_col) {
   unique_data <- unique(data[, c(group_col, rep_col), drop = FALSE])
   instance_counts <- tapply(unique_data[[rep_col]], unique_data[[group_col]], length)
   return(instance_counts)
@@ -41,8 +38,11 @@ count_instances <- function(data, group_col, rep_col, na.rm = FALSE) {
 #'
 #' @seealso `count_instances()`, `autofilter_instances()`
 #' @export
-filter_instances <- function(data, group_col, rep_col, min_times = 2, na.rm = FALSE) {
-  instance_counts <- count_instances(data, group_col, rep_col, na.rm)
+filter_instances <- function(data, group_col, rep_col, min_times = 2) {
+  if (any(class(data) != 'data.frame')) data <- as.data.frame(data)
+  if (is.null(rownames(data))) rownames(data) <- seq_len(nrow(data))
+  
+  instance_counts <- count_instances(data, group_col, rep_col)
   valid_groups <- names(instance_counts[instance_counts >= min_times])
   filtered_data <- droplevels(data[data[[group_col]] %in% valid_groups, , drop = FALSE])
   return(filtered_data)
@@ -63,31 +63,44 @@ filter_instances <- function(data, group_col, rep_col, min_times = 2, na.rm = FA
 #'
 #' @return A *data.frame*, a filtered version of `data`.
 #' @export
-autofilter_instances <- function(data, site, year, geno, min_times = 2, na.rm = TRUE, max_cycles = 999) {
+autofilter_instances <- function(data, site, year, geno, min_times = 2, max_cycles = 999) {
+  if (any(class(data) != 'data.frame')) data <- as.data.frame(data)
+  
   rn <- rownames(data)
   if (is.null(rn)) {
     rn <- seq_len(nrow(data))
     rownames(data) <- rn
   }
-  data$siteyear <- paste(data[[site]], data[[year]], sep = "___")
+  
+  data$siteyear <- paste(as.numeric(as.factor(data[[site]])), 
+                         as.numeric(as.factor(data[[year]])), 
+                         sep = "_") |>
+    as.factor()
   prev_nr <- nrow(data)
-  cycles <- 0
+  cycles <- 1
   repeat {
     data <- data |>
-      filter_instances(geno, year, min_times, na.rm) |>
-      filter_instances(site, year, min_times, na.rm) |>
-      filter_instances("siteyear", geno, min_times, na.rm)
+      filter_instances(geno, year, min_times) |>
+      filter_instances(site, year, min_times) |>
+      filter_instances("siteyear", geno, min_times)
     new_nr <- nrow(data)
+    
     if (new_nr == prev_nr || cycles >= max_cycles) break
     prev_nr <- new_nr
     cycles <- cycles + 1
   }
-  keep_rn <- rn %in% rownames(data)
-  out <- data[keep_rn, , drop = FALSE]
+  
+  keep_rn <- rn[rn %in% rownames(data)]
+  out <- data[keep_rn, , drop=FALSE]
+  
+  out$siteyear <- NULL
+  
   if (cycles >= max_cycles) {
     message("Stopped filtering after ", cycles, " cycles. Consider increasing `max_cycles`.")
   } else {
-    cat("Filtered geno-years, site-years, and genos per site-year to at least ", min_times, " instances over ", cycles, ifelse(cycles > 1, " cycles.", " cycle."))
+    cat("Filtered geno-years, site-years, and genos per site-year to at least ", 
+        min_times, " instances over ", 
+        cycles, ifelse(cycles > 1, " cycles.", " cycle."))
   }
   return(out)
 }

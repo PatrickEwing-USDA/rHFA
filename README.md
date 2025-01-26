@@ -2,25 +2,26 @@
 
 Home Field Advantage (HFA) is the fitness gain an entry (genotype) realizes by growing in its home location, which is empirically defined as the location of highest fitness relative to other entries (Ewing *et al*., 2019).
 
-### Requirements
+### Data Requirements
 
 Input data should be analogous to common gardens. Ex. breeding trials, multi-environment trials, yield trials.
 
-### Brief how-to:
+### Installation
+The rHFA Guide vignette contains a step-by-step analysis of sample data. When installing the package from github, use this command to ensure the vignette is included.
 
-1.  `permute_hfa()` to run hfa analysis. This will work at the population, genotype, site, and year level.
+`remotes::install_github("PatrickEwing-USDA/rHFA", build_vignettes = TRUE)`
+
+Then, to view the vignette:
+
+`vignette('rhfa-guide', package='rHFA')`
+
+### Brief how-to
+
+1.  `permute_hfa()` to run hfa analysis at the population, genotype, site, and year level.
 2.  `id_home()` to return the home site of each genotype
 3.  `specialist_test()` and `generalist_test()` to identify specialists and generalists.
 
-The rHFA Guide vignette contains a step-by-step analysis of sample data. When installing the package from github, use this command to ensure the vignette is included.
-
-`> remotes::install_github("PatrickEwing-USDA/rHFA", build_vignettes = TRUE)`
-
-Then:
-
-`> vignette('rhfa-guide', package='rHFA')`
-
-See analysis code for publications below and methods described in those publications - especially Ewing *et al*. (2019).
+See the vignette and analysis code for publications below and methods described in those publications - especially Ewing *et al*. (2019).
 
 ### Publications:
 

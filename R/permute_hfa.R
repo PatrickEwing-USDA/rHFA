@@ -337,8 +337,7 @@ permute_hfa <- function(data,
   # finish formula to include the phenotype
   ff <- formula(paste(pheno, '~', as.character(ff)[2]))
   
-  out <- list(home_field = test_results, data = do.call(rbind, dd), perms = perms, formula = ff)
-  attr(out, 'Print_Warning') <- "A print method is on its way. For now, you probably want to call obj$home_field."
+  out <- list(home_field = test_results, data = do.call(rbind, dd), perms = perms, formula = ff, level=level)
   
   class(out) = c('rHFA', 'list')
   return(out)

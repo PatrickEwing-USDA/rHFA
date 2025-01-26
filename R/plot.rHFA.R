@@ -103,7 +103,7 @@ plot_data <- function(x, expected=FALSE) {
 #'@importFrom stats median quantile
 #'
 #'@export
-plot.rHFA <- function(x, grouping=NULL) {
+plot.rHFA <- function(x, grouping=NULL, colors=NULL) {
   perms <- plot_data(x)$perms
   
   CI90 = function(x) {
@@ -118,9 +118,30 @@ plot.rHFA <- function(x, grouping=NULL) {
   }
   
   perms$grouping = perms$permutation
+  
   if (!is.null(grouping)) {
-    is_observed = perm$permutation == 'observed'
-    perm[is_observed, 'grouping'] = grouping
+    is_observed = perms$permutation == 'observed'
+    perms[is_observed, 'grouping'] = grouping
+    
+    if (length(unique(grouping)) > 13 & is.null(colors)) {
+      stop("You have too many groups. Please reduce to 13 or specify colors.")
+    }
+  }
+  
+  if (is.null(colors)) {  # Paired from RColorBrewer::brewer.pal, reordered, plus black. 
+    colors = c( '#1F78B4', 
+                '#E31A1C', 
+                '#33A02C', 
+                '#FF7F00', 
+                '#6A3D9A', 
+                '#B15928', 
+                '#A6CEE3', 
+                '#FB9A99', 
+                '#B2DF8A', 
+                '#FDBF6F', 
+                '#CAB2D6', 
+                '#FFFF99',
+                'black')
   }
   
   xname = names(perms)[2]
@@ -129,13 +150,14 @@ plot.rHFA <- function(x, grouping=NULL) {
   plt = ggplot(perms,
                aes(x=.data[[xname]],
                    y=.data[[yname]])) +
+    scale_color_manual(values=colors) +
     stat_summary(geom='pointrange',
                  fun.data=CI90,
-                 color='darkgray',
+                 color='gray',
                  linewidth=1.5) +
     stat_summary(geom='pointrange',
                  fun.data=CI95,
-                 color='darkgray',
+                 color='gray',
                  linewidth=.5) +
     geom_point(data=subset(perms, permutation=='observed'),
                mapping=aes(color=grouping),

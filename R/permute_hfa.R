@@ -344,7 +344,20 @@ permute_hfa <- function(data,
   # finish formula to include the phenotype
   ff <- formula(paste(pheno, '~', as.character(ff)[2]))
   
-  out <- list(home_field = test_results, data = do.call(rbind, dd), perms = perms, formula = ff, level=level)
+  # recombine dd into a data.frame
+  dd <- do.call(rbind, dd)
+  if (is.na(popn)) {
+    dd <- data.frame(
+      population = 'popn1',
+      dd
+    )
+  }
+
+  out <- list(home_field = test_results, 
+              data = dd,
+              perms = perms, 
+              formula = ff, 
+              level = level)
   
   class(out) = c('rHFA', 'list')
   return(out)

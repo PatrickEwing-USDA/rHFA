@@ -1,0 +1,132 @@
+---
+title: "rHFA Dev"
+output: html_document
+date: "2025-01-23"
+---
+
+Feature development scripts for rHFA.
+
+```{r}
+setwd(here::here())
+devtools::load_all()
+
+site='SITE'
+year='YEAR'
+geno='HYBRID'
+pheno='YIELD'
+
+data(corn)
+
+# TODO: Why is this returning a bunch of NA?
+corn = autofilter_instances(corn, site, year, geno, min_times=3) 
+```
+# Plotting
+## Population: Observed vs expected.
+```{r}
+pophfa = permute_hfa(corn, 'population', site, year, geno, pheno, times=99, method='mean', parallel=FALSE)
+plot.rHFA(pophfa)
+```
+
+```{r}
+genohfa = permute_hfa(corn, 'genotype', site, year, geno, pheno, times=9, blup=TRUE, parallel=FALSE)
+genohfa |>
+  plot()
+```
+
+```{r}
+permute_hfa(corn, 'year', site, year, geno, pheno, times=99, parallel=FALSE) |>
+  plot()
+```
+
+
+```{r}
+plot.rHFA(genohfa, 
+          grouping=sample(1:13, nrow(genohfa$home_field), replace=TRUE), 
+          colors=c(RColorBrewer::brewer.pal(12, 'Paired'), 'black'))
+```
+
+```{r}
+plot.rHFA(pophfa) +
+  theme(axis.text.x=element_blank())
+```
+
+
+
+```{r}
+permute_hfa(corn, 'site', site, year, geno, pheno, times=9, parallel=FALSE) |>
+  plot.rHFA()
+```
+
+## TODO Arrows Plots
+
+1. Facets, generalists, and specialists?
+2. user-specified colors
+2. Functionalize
+3. Multiple "expected value" methods?
+4. Test with different levels and groupings.
+```{r}
+rhfa = genohfa
+hfa = rhfa$perms[[1]][, 'observed', drop=FALSE]
+rownames(hfa) = gsub(":is_home", "", rownames(hfa))
+
+# get the (genetic, site, year) potential 
+cn = colnames(rhfa$data)
+grp = rhfa$level |>
+  switch(
+  population=cn[1],
+  site=cn[3],
+  year=cn[4],
+  genotype=cn[5])
+pheno = cn[2]
+
+
+dd = rhfa$data
+if (is.null(grouping)) {
+  dd[, 'grouping'] = 'group1'
+} else if (length(grouping) == 1) {
+  dd[, 'grouping'] = dd[, grouping]
+} else {
+  dd$grouping = grouping
+}
+
+pltdf = paste(pheno, '~', grp, '+ grouping') |>
+  formula() |>
+  aggregate(dd, mean, na.omit=TRUE) |>
+  merge(hfa, by.x=grp, by.y='row.names')
+pltdf[, 'home_pheno'] = pltdf[, pheno] + pltdf[, 'observed']
+
+sorter = order(pltdf[, pheno],
+               decreasing=TRUE)
+pltdf[, grp] = factor(pltdf[, grp], 
+                     levels=pltdf[sorter, grp])
+
+toproper = function(x) {
+  a = substr(x, 1, 1) |>
+    toupper()
+  b = substr(x, 2, nchar(x)) |>
+    tolower()
+  out = paste0(a, b)
+}
+
+plt <- ggplot(pltdf,
+              aes(x=.data[[pheno]],
+                  y=.data[[grp]],
+                  color=grouping)) +
+  geom_point(size=1) +
+  geom_segment(aes(xend = home_pheno,
+                   yend = .data[[grp]]),
+               arrow=arrow(length=unit(0.015, 'npc'))) +
+  labs(title = paste('Expected', tolower(pheno), 'and HFA'),
+       x = toproper(grp),
+       y = toproper(pheno),
+       color=NULL) +
+  theme_minimal()
+
+if (is.null(grouping)) {
+  plt = plt +
+    theme(legend.position='none')
+}
+plt
+
+```
+

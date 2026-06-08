@@ -32,7 +32,9 @@ See the vignette and analysis code for publications below and methods described 
 *Disclaimer: Mention of trade names or commercial products in this publication is solely for the purpose of providing specific information and does not imply recommendation or endorsement by the U.S. Department of Agriculture. The USDA is an equal opportunity provider and employer.*
 
 ## Issues and Development ##
-rHFA is still under development! The following are known issues:
+rHFA is still under development! The code **may** contain unpatched or unknown vulnerabilities. It should **not** be used in production systems.    
+
+The following are known issues:
 
 1. When `method="blup"`, permutation testing with `permute_hfa()` may stop on error or the significance test may produce an NA. These are related issues. Either increase `min_times` in `*filter_instances()` or try a different method, such as `method='median'`.
 2. If using `remotes::install_github()`, you may need to run `install.packages('ps')` and restart R.
